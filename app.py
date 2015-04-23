@@ -39,7 +39,6 @@ class Application(Tk):
         self.myframe.bind("<Button-3>", self.showContextMenu)
         
     def showContextMenu(self, e):
-        print("Button 3")
         self.context.tk_popup(e.x_root, e.y_root,0)
        
 
