@@ -10,7 +10,7 @@ class Application(Tk):
 
         # file menus
         filemenu = Menu(menubar, tearoff=0)
-        filemenu.add_command(label="Open", command=hello)
+        filemenu.add_command(label="Open", command = self.cmdOpen)
         filemenu.add_command(label="Save", command=hello)
         filemenu.add_separator()
         filemenu.add_command(label="Exit", command=self.destroy)
@@ -31,19 +31,32 @@ class Application(Tk):
         self.config(menu=menubar)#lock in menubar
 
         self.context = Menu(self, tearoff=0)
-        self.context.add_command(label="Beep", command=self.on3)
-        self.context.add_command(label="Exit", command=self.on3)
+        self.context.add_command(label="Beep", command=hello)
+        self.context.add_command(label="Exit", command=hello)
 
         self.myframe = Frame(self, width=512, height=512)
         self.myframe.pack()
+        self.myframe.focus_set()
         self.myframe.bind("<Button-3>", self.showContextMenu)
+        #self.myframe.bind("<Key>", self.key)
+
+
+        #Bind keys for commands
+        #NB. bind calls method with self and event
+        #So we need a method that takes these parameters
+        #then simply calls the command method the the menu calls
+        
+        self.myframe.bind("<Control-o>", self.keyOpen)
+        
         
     def showContextMenu(self, e):
         self.context.tk_popup(e.x_root, e.y_root,0)
-       
+        
+    def keyOpen(self, e):
+        self.cmdOpen()
 
-    def on3(self):
-        print("Hello")
+    def cmdOpen(self):
+        print("Open")
 
     def init(self):
         self.grid()
