@@ -1,17 +1,19 @@
-from tkinter import Tk, Menu, Frame
+from tkinter import *
 
 class Application(Tk):
     def __init__(self,title):
         super(Application,self).__init__()
-        self.title(title)
-
+        self.appname = "Code Maker"
+        self.filename = ""
+        self.setTitle()        
+        
         # main menu
         menubar = Menu(self)
 
         # file menus
         filemenu = Menu(menubar, tearoff=0)
         filemenu.add_command(label="Open", command = self.cmdOpen)
-        filemenu.add_command(label="Save", command=hello)
+        filemenu.add_command(label="Save", command = self.cmdSave)
         filemenu.add_separator()
         filemenu.add_command(label="Exit", command=self.destroy)
         menubar.add_cascade(label="File", menu=filemenu)
@@ -47,8 +49,24 @@ class Application(Tk):
         #then simply calls the command method the the menu calls
         
         self.myframe.bind("<Control-o>", self.keyOpen)
+        self.myframe.bind("<Control-s>", self.keySave)
         
-        
+        toolbar = Frame(self)
+
+        b = Button(toolbar, text="new", width=6, command=hello)
+        b.pack(side=LEFT, padx=2, pady=2)
+
+        b = Button(toolbar, text="open", width=6, command=self.cmdOpen)
+        b.pack(side=LEFT, padx=2, pady=2)
+
+        toolbar.pack(side=TOP, fill=X)
+
+    def setTitle(self):
+        if self.filename == "":
+            self.title(self.appname)
+        else:
+            self.title(self.appname + "-" + self.filename)
+
     def showContextMenu(self, e):
         self.context.tk_popup(e.x_root, e.y_root,0)
         
@@ -56,15 +74,29 @@ class Application(Tk):
         self.cmdOpen()
 
     def cmdOpen(self):
-        print("Open")
+        self.filename = filedialog.askopenfilename( filetypes = (("Gcode","*.gcode"),("All files","*.*")))
+        if self.filename !="":
+            self.setTitle()
 
-    def init(self):
-        self.grid()
+    def keySave(self, e):
+        self.cmdSave()
+        
+    def cmdSave(self):
+        '''if app already has a filename simply save else do save as'''
+        if self.filename != "":
+            pass
+            #Put save code here
+        else:
+            self.cmdSaveAs()
+
+    def cmdSaveAs(self):
+        file = filedialog.asksaveasfile()
+        self.filename=file.name
+        self.setTitle()
         
 def hello():
     print("Hello")
         
 app = Application("My App")
 app.geometry("250x150+300+300")
-#frame = MyFrame(app)
 app.mainloop()
