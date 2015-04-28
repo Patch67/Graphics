@@ -5,6 +5,8 @@ class View():
         self.control = control #Allows View to talk to controller
         self.frame = Frame(master, width = 512, height = 512)
         
+        master.wm_state('zoomed')# Full screen Possibly doesn't work on Mac
+        
         # main menu
         menubar = Menu(master)
 
@@ -46,14 +48,22 @@ class View():
 
 
         #Set up frame
-        self.frame.pack()
+        self.frame.pack(fill=BOTH, expand=YES)
         self.frame.focus_set()#enable key events
 
         self.frame.bind("<Control-o>", self.keyOpen)
         self.frame.bind("<Control-s>", self.keySave)
         self.frame.bind("<Button-3>", self.rightClick)
         
+        self.frame.bind("<Configure>", self.onResize)
+
         master.protocol('WM_DELETE_WINDOW', control.cmdExit)#call when window closed
+
+    def onResize(self,e):
+        pass
+        #print(dir(e))
+        #print("x %d, y %d, width %d, height %d" % (e.x, e.y, e.width,e.height))
+        #self.frame.pack(fill=BOTH, expand=YES)
 
     def questionBox(self,title, text):
         return messagebox.askquestion(title, text) == "yes"
