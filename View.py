@@ -39,18 +39,31 @@ class View():
         
         master.config(menu=menubar)#lock in menubar
 
+        # context menu
+        self.context = Menu(master, tearoff=0)
+        self.context.add_command(label="Dirty", command=control.cmdDirty)
+        self.context.add_command(label="Clean", command=control.cmdClean)
+
+
         #Set up frame
-        #self.frame = Frame(self,)
         self.frame.pack()
         self.frame.focus_set()#enable key events
 
         self.frame.bind("<Control-o>", self.keyOpen)
         self.frame.bind("<Control-s>", self.keySave)
+        self.frame.bind("<Button-3>", self.rightClick)
         
         master.protocol('WM_DELETE_WINDOW', control.cmdExit)#call when window closed
 
-    def messageBox(self,text):
-        return messagebox.askquestion("Patrick says",text) == "yes"
+    def questionBox(self,title, text):
+        return messagebox.askquestion(title, text) == "yes"
+
+    def warningBox(self, title, text):
+        messagebox.showwarning(title, text)
+
+    def infoBox(self, title, text):
+        messagebox.showinfo(title, text)
+
 
     def openFileDialog(self):
         return filedialog.askopenfilename( filetypes = (("Gcode","*.gcode"),("All files","*.*")))
@@ -61,5 +74,11 @@ class View():
     def keyOpen(self, e):
         self.control.cmdOpen()
 
-    def keySave(self ,e):
+    def keySave(self, e):
         self.control.cmdOpen()
+
+    def rightClick(self, e):
+        self.control.cmdRightClick(e.x_root, e.y_root)
+        
+    def showContextMenu(self, x, y):
+        self.context.tk_popup(x, y, 0)

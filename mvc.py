@@ -37,24 +37,45 @@ class Controller():
             self.cmdSaveAs()
 
     def cmdSaveAs(self):
-        file = self.view.saveFileDialog(self.filename)
-        if file:#if valid file
-            #self.model.save(filename)
-            self.filename = file.name
-            self.setTitle()
-            file.close()
+        try:
+            file = self.view.saveFileDialog(self.filename)
+        except IOError:
+            self.view.warningBox(self.appname, "Can't open file %s" % self.filename)
+        else:
+            if file:#if valid file
+                #self.model.save(filename)
+                self.filename = file.name
+                file.close()
+                self.model.setClean()
+                self.setTitle()
+        
 
     def cmdExit(self):
         if self.model.getDirty():
-            if self.view.messageBox("Do you want to save your work?"):
+            if self.view.questionBox(self.appname, "Do you want to save your work?"):
                 self.cmdSave()
-        self.root.destroy()
+        self.root.destroy()#This is tkinter specific
+
+    def cmdRightClick(self, x, y):
+        self.view.showContextMenu(x, y)
 
     def cmdNull(self):
-        pass
+        self.view.infoBox(self.appname, "Not yet implemented")
+
+    def cmdDirty(self):
+        self.model.setDirty()
+        self.setTitle()
+
+    def cmdClean(self):
+        self.model.setClean()
+        self.setTitle()
     
     def getTitle(self):
-        title = self.appname
+        if self.model.getDirty():
+            title = "*"
+        else:
+            title = " "
+        title += self.appname
         if self.filename != "":
             title += "-" + self.filename
         return title
@@ -64,7 +85,7 @@ class Controller():
         
     def run(self):
         self.setTitle()
-        self.root.mainloop()
+        self.root.mainloop()#This is tkinter specific
 
 #Main program
 controller = Controller()
