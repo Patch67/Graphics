@@ -2,63 +2,28 @@
 tkinter MVC
 '''
 
-from tkinter import *
-
-class Model():
-    def __init__(self):
-        self.__dirty = False
-
-    def setDirty(self):
-        self.__dirty = True
-
-    def getDirty(self):
-        return self.__dirty
-
-class View():
-    def __init__(self, master):
-        self.frame = Frame(master)
+from tkinter import Tk
+from Model import *
+from View import *
 
 class Controller():
     def __init__(self):
         self.root = Tk()
         self.model = Model()
-        self.view = View(self.root)
+        self.view = View(self,self.root)
+        self.appname = ""
+        self.filename = ""
 
-        # main menu
-        menubar = Menu(self.root)
-
-        # file menus
-        filemenu = Menu(menubar, tearoff=0)
-        filemenu.add_command(label="Open", command = self.cmdOpen)
-        filemenu.add_command(label="Save", command = self.cmdSave)
-        filemenu.add_command(label="Save as", command = self.cmdSaveAs)
-        filemenu.add_separator()
-        filemenu.add_command(label="Exit", command = self.cmdExit)
-        menubar.add_cascade(label="File", menu = filemenu)
-
-        # edit menus
-        editmenu = Menu(menubar, tearoff=0)
-        editmenu.add_command(label="Undo", command = self.cmdNull)
-        editmenu.add_command(label="Redo", command = self.cmdNull)
-        editmenu.add_separator()
-        editmenu.add_command(label="Cut", command = self.cmdNull)
-        editmenu.add_command(label="Copy", command = self.cmdNull)
-        editmenu.add_command(label="Paste", command = self.cmdNull)
-        editmenu.add_separator()
-        editmenu.add_command(label="Delete", command = self.cmdNull)
-        editmenu.add_separator()
-        editmenu.add_command(label="Select all", command = self.cmdNull)
-        menubar.add_cascade(label="Edit", menu = editmenu)
-
-        # help menus
-        helpmenu = Menu(menubar, tearoff=0)
-        helpmenu.add_command(label="About", command = self.cmdNull)
-        menubar.add_cascade(label="Help", menu = helpmenu)
-        
-        self.root.config(menu=menubar)#lock in menubar
+    def cmdNew(self):
+        if self.model.getDirty():
+            self.cmdSave()
+        self.model = Model()
+        self.filename = ""
+        self.setTitle()
+            
     
     def cmdOpen(self):
-        self.filename = filedialog.askopenfilename( filetypes = (("Gcode","*.gcode"),("All files","*.*")))
+        self.filename = self.view.openFileDialog()
         if self.filename !="":
             self.setTitle()
 
@@ -67,24 +32,41 @@ class Controller():
         if self.filename != "":
             pass
             #Put save code here
+            #self.model.save(filename)
         else:
             self.cmdSaveAs()
 
     def cmdSaveAs(self):
-        file = filedialog.asksaveasfile()
-        self.filename=file.name
-        self.setTitle()
+        file = self.view.saveFileDialog(self.filename)
+        if file:#if valid file
+            #self.model.save(filename)
+            self.filename = file.name
+            self.setTitle()
+            file.close()
 
     def cmdExit(self):
+        if self.model.getDirty():
+            if self.view.messageBox("Do you want to save your work?"):
+                self.cmdSave()
         self.root.destroy()
 
     def cmdNull(self):
         pass
+    
+    def getTitle(self):
+        title = self.appname
+        if self.filename != "":
+            title += "-" + self.filename
+        return title
+    
+    def setTitle(self):
+        self.root.title(self.getTitle())
         
     def run(self):
-        self.root.title("MVC App")
+        self.setTitle()
         self.root.mainloop()
 
 #Main program
 controller = Controller()
+controller.appname = "My MVC GUI"
 controller.run()
