@@ -56,6 +56,9 @@ class Controller():
                 self.cmdSave()
         self.root.destroy()#This is tkinter specific
 
+    def cmdToolbar(self):
+        self.view.hideToolbar()
+
     def cmdRightClick(self, x, y):
         self.view.infoBox("User pressed","x %d, y %d" % (x,y))
         self.view.showContextMenu(x, y)

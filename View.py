@@ -1,10 +1,11 @@
 from tkinter import *
+from PIL import Image, ImageTk
 
 class View():
     def __init__(self, control, master):
         self.control = control #Allows View to talk to controller
-        self.frame = Frame(master, width = 512, height = 512)
-        
+        #self.frame = Frame(master, width = 512, height = 512)
+        self.frame = Frame(master)
         master.wm_state('zoomed')# Full screen Possibly doesn't work on Mac
         
         # main menu
@@ -34,6 +35,13 @@ class View():
         editmenu.add_command(label="Select all", command = control.cmdNull)
         menubar.add_cascade(label="Edit", menu = editmenu)
 
+        # toolbar menus
+        
+        toolbarmenu = Menu(menubar, tearoff=0)
+        check = StringVar()
+        toolbarmenu.add_checkbutton(label='Tools', variable=check, onvalue=1, offvalue=0)
+        menubar.add_cascade(label="Toolbar", menu = toolbarmenu)
+
         # help menus
         helpmenu = Menu(menubar, tearoff=0)
         helpmenu.add_command(label="About", command = control.cmdNull)
@@ -46,6 +54,17 @@ class View():
         self.context.add_command(label="Dirty", command=control.cmdDirty)
         self.context.add_command(label="Clean", command=control.cmdClean)
 
+        #Add toolbar
+        self.toolbar = Frame(master, bd=1, relief=RAISED)
+
+        self.img = Image.open("exit.png")
+        eimg = ImageTk.PhotoImage(self.img)  
+
+        exitButton = Button(self.toolbar, image=eimg, bd=1, relief=RAISED, command=control.cmdExit)
+        exitButton.image = eimg
+        exitButton.pack(side=LEFT, padx=2, pady=2)
+       
+        self.toolbar.pack(side=TOP, fill=X)
 
         #Set up frame
         self.frame.pack(fill=BOTH, expand=YES)
@@ -59,11 +78,11 @@ class View():
 
         master.protocol('WM_DELETE_WINDOW', control.cmdExit)#call when window closed
 
+
+        
+
     def onResize(self,e):
         pass
-        #print(dir(e))
-        #print("x %d, y %d, width %d, height %d" % (e.x, e.y, e.width,e.height))
-        #self.frame.pack(fill=BOTH, expand=YES)
 
     def questionBox(self,title, text):
         return messagebox.askquestion(title, text) == "yes"
@@ -92,3 +111,9 @@ class View():
         
     def showContextMenu(self, x, y):
         self.context.tk_popup(x, y, 0)
+
+    def showToolBar(self):
+        self.toolbar.lift(self.master)
+
+    def hideToolbar(self):
+        self.toolbar.lower(self.frame)
