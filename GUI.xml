@@ -1,0 +1,39 @@
+<application name="Patrick's App">
+	<menu name="main">
+		<menu name="File">
+			<menu name="New" keys="<Ctrl>N" command="cmdNew"/>
+			<menu name="Open" keys="<Ctrl>O" command="cmdOpen"/>
+			<menu name="Save" keys="<Ctrl>S" command="cmdSave"/>
+			<menu name="Save As" command="cmdSaveAs"/>
+			<menu name="Print" keys="<Ctrl>P" command="cmdPrint"/>
+			<menu name="Exit" command="cmdExit"/>
+		</menu>
+		<menu name="Edit">
+			<menu name="Undo" keys="<Ctrl>Z" command="cmdUndo"/>
+			<menu name="Redo" keys="<Ctrl>O" command="cmdRedo"/>
+			<menu/>
+			<menu name="Cut" keys="<Ctrl>X" command="cmdCut"/>
+			<menu name="Copy" keys="<Ctrl>C" command="cmdCopy"/>
+			<menu name="Paste" keys="<Ctrl>V" command="cmdPaste"/>
+			<menu name="Delete" keys="<Del>" command="cmdDelete"/>
+			<menu name="Select All" keys="<Ctrl>A" command="cmdSelectAll"/>
+		</menu>
+		<menu name="Toolbars">	
+			<menu name="Standard" command="cmdCut"/>
+			<menu name="Tools" command="cmdCopy"/>
+		</menu>
+		<menu name="Help">
+			<menu name="Index" keys="<F1>" command="cmdHelpIndex"/>
+			<menu name="About" command="cmdHelpAbout"/>
+		<menu/>
+	</menu>
+	<toolbar name="Mode">
+		<group>
+			<button name="Select" image="select.png" command="cmdSelect"/>
+			<button name="Line" image="line.png" command="cmdLine"/>
+			<button name="Pline" image="pline.png" command="cmdPline"/>
+			<button name="Circle" image="circle.png" command="cmdCircle"/>
+			<button name="Rectangle" image="rectangle.png" command="cmdRectangle"/>
+		</group>
+	</toolbar>
+	
