@@ -5,6 +5,7 @@ tkinter MVC
 from tkinter import Tk
 from Model import *
 from View import *
+from TextGraph import TextGroup
 
 class Controller():
     def __init__(self):
@@ -13,7 +14,12 @@ class Controller():
         self.view = View(self,self.root)
         self.appname = ""
         self.filename = ""
-
+        self.stateTools = True
+        self.mode = "SELECT"
+        self.step = 0
+        self.x = 0#Previous click coords
+        self.y = 0#Previous click coords
+        
     def cmdNew(self):
         if self.model.getDirty():
             self.cmdSave()
@@ -30,9 +36,8 @@ class Controller():
     def cmdSave(self):
         '''if app already has a filename simply save else do save as'''
         if self.filename != "":
-            pass
-            #Put save code here
-            #self.model.save(filename)
+            tg=TextGroup(self.model.graph,sys.stdout)
+            tg.show()
         else:
             self.cmdSaveAs()
 
@@ -44,6 +49,8 @@ class Controller():
         else:
             if file:#if valid file
                 #self.model.save(filename)
+                tg=TextGroup(self.model.graph, file)
+                tg.show()
                 self.filename = file.name
                 file.close()
                 self.model.setClean()
@@ -59,8 +66,42 @@ class Controller():
     def cmdToolbar(self):
         self.view.hideToolbar()
 
+    def cmdLeftClick(self, x, y):
+        if self.mode == "LINE":
+            if self.step == 0:
+                self.x = x
+                self.y = y
+                self.step += 1
+            else:
+                print("Line (%d,%d), (%d,%d)" % (self.x, self.y, x, y))
+                self.model.addLine(self.x, self.y, x, y)
+                self.x = x
+                self.y = y
+                self.step = 0
+        elif self.mode == "CIRCLE":
+            if self.step ==0:
+                self.x = x
+                self.y = y
+                self.step += 1
+            else:
+                print("Circle (%d, %d), %d" % (self.x, self.y, x))
+                self.x = x
+                self.y = y
+                self.step = 0
+        elif self.mode == "RECTANGLE":
+            if self.step == 0:
+                self.x = x
+                self.y = y
+                self.step += 1
+            else:
+                print("Rectangle (%d,%d), (%d,%d)" % (self.x, self.y, x, y))
+                self.model.addRectangle(self.x, self.y, x, y)
+                self.x = x
+                self.y = y
+                self.step = 0
+
     def cmdRightClick(self, x, y):
-        self.view.infoBox("User pressed","x %d, y %d" % (x,y))
+        #self.view.infoBox("User pressed","x %d, y %d" % (x,y))
         self.view.showContextMenu(x, y)
 
     def cmdNull(self):
@@ -73,7 +114,27 @@ class Controller():
     def cmdClean(self):
         self.model.setClean()
         self.setTitle()
-    
+
+    def cmdTools(self):
+        self.stateTools = not(self.stateTools)
+        if self.stateTools:
+            self.view.showToolBar()
+        else:
+            self.view.hideToolBar()
+
+    #Drawing Commands
+    def cmdLine(self):
+        self.mode = "LINE"
+        self.step = 0
+
+    def cmdCircle(self):
+        self.mode = "CIRCLE"
+        self.step = 0
+        
+    def cmdRectangle(self):
+        self.mode = "RECTANGLE"
+        self.step = 0
+
     def getTitle(self):
         if self.model.getDirty():
             title = "*"

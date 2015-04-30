@@ -9,7 +9,7 @@ from TextGraph import *
 from GcodeGraph import *
 
 def cmdSave():
-    f=open("save.txt")
+    f=open("save.txt","w")
     TextGroup.show(model,f)
     f.close()
 
@@ -21,9 +21,10 @@ clipboard = Group("clipboard")
 selected = Group("selected")
 
 model.add(Line(100,100,150,200))
-TextGroup(model,sys.stdout).show()
+tg=TextGroup(model,sys.stdout)
+tg.show()
 
-cmdSave()
+#cmdSave()
 
 print("Finishing Application")
 

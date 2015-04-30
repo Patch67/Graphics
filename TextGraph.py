@@ -13,7 +13,7 @@ class TextLine(Line):
         super(TextLine,self).__init__(line.x0,line.y0,line.x1,line.y1)
 
     def show(self,f):
-        f.writeline("Line (%d, %d) - (%d, %d)" % (self.x0, self.y0, self.x1, self.y1))
+        f.write("Line (%d, %d) - (%d, %d)\n" % (self.x0, self.y0, self.x1, self.y1))
 
 class TextCircle(Circle):
     def __init__(self,circle):
@@ -21,7 +21,7 @@ class TextCircle(Circle):
         super(TextCircle,self).__init__(circle.x,circle.y,circle.r)
 
     def show(self,f):
-        f.writeline("Circle (%d, %d) - %d" % (self.x, self.y, self.r))
+        f.write("Circle (%d, %d) - %d\n" % (self.x, self.y, self.r))
 
 class TextRectangle(Rectangle):
     def __init__(self,rectangle):
@@ -30,7 +30,7 @@ class TextRectangle(Rectangle):
             rectangle.x0,rectangle.y0,rectangle.x1,rectangle.y1)
 
     def show(self,f):
-        f.writeline("Rectangle (%d, %d) - (%d, %d)" % (self.x0, self.y0, self.x1, self.y1))
+        f.write("Rectangle (%d, %d) - (%d, %d)\n" % (self.x0, self.y0, self.x1, self.y1))
 
 class TextText(Text):
     def __init__(self,text):
@@ -38,7 +38,7 @@ class TextText(Text):
         super(TextText,self).__init__(text.x, text.y, text.text)
 
     def show(self,f):
-        f.writeline("Text (%d, %d) - %s" % (self.x, self.y, self.text))
+        f.write("Text (%d, %d) - %s\n" % (self.x, self.y, self.text))
 
 class TextGroup(Group):
     def __init__(self,group,f):
@@ -47,9 +47,8 @@ class TextGroup(Group):
         super(TextGroup,self).__init__(group.name)
 
     def show(self):
-        print("Group: %s" % self.name,self.f)
+        self.f.write("Group: %s\n" % self.name)
         for c in self.group.children:
-            type(c)
             if isinstance(c,Line):
                 TextLine(c).show(self.f)
             elif isinstance(c,Circle):
@@ -59,6 +58,6 @@ class TextGroup(Group):
             elif isinstance(c,Text):
                 TextText(c).show(self.f)
             else:
-                f.writeline("Not Implemented")
+                f.write("Not Implemented\n")
                 type(c)
 
