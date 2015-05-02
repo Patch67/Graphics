@@ -1,4 +1,4 @@
-Htis is the Git hub repository for Patrick Biggs.
+This is the Git hub repository for Patrick Biggs.
 
 In here you'll find all my public code.
 
