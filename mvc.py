@@ -10,10 +10,10 @@ import sys
 
 
 class Controller():
-    __name = ""
-    __filename = ""
+    """This contains the business logic of the application"""
 
     def __init__(self):
+        """Constructor"""
         self.root = Tk()
         self.model = Model()
         self.view = View(self, self.root)
