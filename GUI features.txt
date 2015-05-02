@@ -1,0 +1,31 @@
+What types of GUI control (widget) should I have?
+
+1) An application
+2) A window. Either a single document interface or a multiple document interface (SDi / MDI).
+- An application menu. This may be relevant for Apple systems, but usually in Windows systems this would be integrated into the main menu
+- A main menu - This will remain relatively fixed.
+- A context menu - This will change depending upon what is actually selected. It is usually triggered by a right mouse click in Windows but on Apple systems it might be <Control> left click.
+
+Some menu options may have different states, i.e. an option might be greyed out if it not currently available.
+Some menu options may have a ticked state. For example to indicate if a toolbar is visible ot not there may be a tick beside it.
+Some menu options may be completely runtime dependent, for example the list of fonts may depend upon the actual installation being run.
+
+Floating tool palettes. These can be dragged to the edges of the screen to dock or can be torn off and dragged around the screen independently.
+
+Buttons - These Are Usually images with a push state, but they could also be toggle switches or they could be radio buttons.
+
+Buttons
+-Push Buttons
+-Toggle Buttons
+-Radio Button groups - where only one button at a time maybe pushed, all the others will pop up.
+
+Dialogs
+-SaveFile
+-OpenFile
+-MessageBox
+-WarningBox
+-InformationBox
+
+Status Bars
+Progress Bars
+Scroll Bars

@@ -1,28 +1,30 @@
 from Graph import Group, Line, Rectangle, Circle
 
+
 class Model():
+    # __dirty = False
+
     def __init__(self):
         self.__dirty = False
         self.graph = Group("Main")
 
-    def addLine(self, x0, y0, x1, y1):
-        self.__graph.add(Line(x0,y0,x1,y1))
-        self.setDirty()
+    def add_line(self, x0, y0, x1, y1):
+        self.graph.add(Line(x0,y0,x1,y1))
+        self.set_dirty(True)
     
-    def addRectangle(self, x0, y0, x1, y1):
+    def add_rectangle(self, x0, y0, x1, y1):
         self.graph.add(Rectangle(x0,y0,x1,y1))
-        self.setDirty()
+        self.set_dirty(True)
 
-    def addCircle(self,x, y, r):
+    def add_circle(self,x, y, r):
         self.graph.add(Circle(x, y, r))
-        self.setDirty()
+        self.set_dirty(True)
 
-    def setDirty(self):
-        self.__dirty = True
+    def set_dirty(self, dirty):
+        print("Setting dirty to %s" % dirty)
+        self.__dirty = dirty
+        print("__dirty = %s" % dirty)
 
-    def setClean(self):
-        self.__dirty = False
-        
-    def getDirty(self):
+    def get_dirty(self):
         return self.__dirty
 

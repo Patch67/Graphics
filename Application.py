@@ -24,7 +24,7 @@ model.add(Line(100,100,150,200))
 tg=TextGroup(model,sys.stdout)
 tg.show()
 
-#cmdSave()
+#cmd_save()
 
 print("Finishing Application")
 
