@@ -10,18 +10,16 @@ import sys
 
 
 class Controller():
-    __name = ""
-    __filename = ""
 
-    def __init__(self):
+    def __init__(self, name):
         self.root = Tk()
         self.model = Model()
         self.view = View(self, self.root)
-        self.__name = ""
+        self.__name = name
         self.__filename = ""
         self.stateTools = True
         self.mode = "SELECT"
-        self.step = 0
+        self.step = 0  # Used to keep track of mouse presses, i.e. line, circle and rectangle need 2, pline > 1
         self.x = 0  # Previous click coords
         self.y = 0  # Previous click coords
 
@@ -36,7 +34,7 @@ class Controller():
             self.cmd_save()
         self.model = Model()
         self.__filename = ""
-        self.set_title()
+        self.make_title()
             
     
     def cmd_open(self):
@@ -46,7 +44,7 @@ class Controller():
                 self.cmd_save()
         self.__filename = self.view.open_file_dialog()
         if self.__filename != "":
-            self.set_title()
+            self.make_title()
 
     def cmd_save(self):
 
@@ -69,7 +67,7 @@ class Controller():
                 self.__filename = file.name
                 file.close()
                 self.model.set_dirty(False)
-                self.set_title()
+                self.make_title()
 
     def cmd_dirty(self):
         self.cmd_set_dirty(True)
@@ -128,9 +126,8 @@ class Controller():
         self.view.info_box(self.__name, "Not yet implemented")
 
     def cmd_set_dirty(self, dirty):
-        print("Setting dirty ",dirty)
         self.model.set_dirty(dirty)
-        self.set_title()
+        self.make_title()
 
     def cmd_tools(self):
         self.stateTools = not self.stateTools
@@ -160,17 +157,15 @@ class Controller():
             title = " "
         title += self.__name
         title += " - " + self.__filename
-        print("Title is %s" % title)
         return title
     
-    def set_title(self):
+    def make_title(self):
         self.root.title(self.get_title())
         
     def run(self):
-        self.set_title()
+        self.make_title()
         self.root.mainloop()  # This is tkinter specific
 
 # Main program
-controller = Controller()
-controller.set_name("My MVC GUI")
+controller = Controller("My MVC GUI")
 controller.run()

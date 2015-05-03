@@ -2,7 +2,6 @@ from Graph import Group, Line, Rectangle, Circle
 
 
 class Model():
-    # __dirty = False
 
     def __init__(self):
         self.__dirty = False
@@ -21,9 +20,7 @@ class Model():
         self.set_dirty(True)
 
     def set_dirty(self, dirty):
-        print("Setting dirty to %s" % dirty)
         self.__dirty = dirty
-        print("__dirty = %s" % dirty)
 
     def get_dirty(self):
         return self.__dirty
