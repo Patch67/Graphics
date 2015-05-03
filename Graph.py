@@ -8,7 +8,7 @@ Patrick Biggs
 import abc
 
 
-#Abstract Base class
+# Abstract Base class
 class Graph:
     __metaclass__ = abc.ABCMeta
     
@@ -17,10 +17,10 @@ class Graph:
         pass
     
     @abc.abstractmethod
-    def show(self):
+    def save(self):
         pass
     
-#Concrete Classes
+# Concrete Classes
 class Line(Graph):
     def __init__(self, x0, y0, x1, y1):
         self.x0 = x0
@@ -47,7 +47,7 @@ class Text(Graph):
         self.y = y
         self.text = text
         
-#Implements the composite pattern
+# Implements the composite pattern
 class Group(Graph):
     def __init__(self,name):
         self.name = name
