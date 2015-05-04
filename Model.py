@@ -18,7 +18,13 @@ class Model():
         '''For graphics application'''
         self.graph = Group("Main")
 
-    def set_dirty(self, dirty):
+    @property
+    def dirty(self):
+        """Getter for __dirty"""
+        return self.__dirty
+
+    @dirty.setter
+    def dirty(self, dirty):
         """Setter for dirty
 
         If dirty has changed will inform controller
@@ -30,20 +36,16 @@ class Model():
             self.__dirty = dirty  # Change value
             self.controller.dirty_changed()  # Notify Controller that value changed
 
-    def get_dirty(self):
-        """Getter for __dirty"""
-        return self.__dirty
-
     def add_line(self, x0, y0, x1, y1):
         self.graph.add(Line(x0,y0,x1,y1))
-        self.set_dirty(True)
+        self.dirty = True
     
     def add_rectangle(self, x0, y0, x1, y1):
         self.graph.add(Rectangle(x0,y0,x1,y1))
-        self.set_dirty(True)
+        self.dirty = True
 
     def add_circle(self,x, y, r):
         self.graph.add(Circle(x, y, r))
-        self.set_dirty(True)
+        self.dirty = True
 
 

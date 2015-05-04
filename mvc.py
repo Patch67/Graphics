@@ -47,13 +47,13 @@ class Controller():
     '''Commands - Responses to GUI events'''
 
     def cmd_new(self):
-        if self.model.get_dirty():
+        if self.model.dirty:
             self.cmd_save()
         self.model = Model(self)
         self.set_filename("")
 
     def cmd_open(self):
-        if self.model.get_dirty():  # App has unsaved data so ask user to save it
+        if self.model.dirty:  # App has unsaved data so ask user to save it
 
             if self.view.question_box(self.__name, "Do you want to save your work?"):
                 self.cmd_open()
@@ -79,30 +79,30 @@ class Controller():
                 TextGroup(self.model.graph, file).show()
                 self.set_filename(file.name)
                 file.close()
-                self.model.set_dirty(False)
+                self.model.dirty = False
 
     def cmd_exit(self):
-        if self.model.get_dirty():
+        if self.model.dirty:
             if self.view.question_box(self.__name, "Do you want to save your work?"):
                 self.cmd_save()
         self.view.exit()  # Exit the application
 
     def cmd_dirty(self):
         """Called from context menu"""
-        self.model.set_dirty(True)
+        self.model.dirty = True
 
     def cmd_clean(self):
         """Called from context menu"""
-        self.model.set_dirty(False)
+        self.model.dirty = False
 
     def cmd_left_click(self, x, y):
+        """Called when user clicks left mouse button"""
         if self.mode == "LINE":
             if self.step == 0:
                 self.x = x
                 self.y = y
                 self.step += 1
             else:
-                print("Line (%d,%d), (%d,%d)" % (self.x, self.y, x, y))
                 self.model.add_line(self.x, self.y, x, y)
                 self.x = x
                 self.y = y
@@ -113,7 +113,6 @@ class Controller():
                 self.y = y
                 self.step += 1
             else:
-                print("Circle (%d, %d), %d" % (self.x, self.y, x))
                 self.x = x
                 self.y = y
                 self.step = 0
@@ -123,7 +122,6 @@ class Controller():
                 self.y = y
                 self.step += 1
             else:
-                print("Rectangle (%d,%d), (%d,%d)" % (self.x, self.y, x, y))
                 self.model.add_rectangle(self.x, self.y, x, y)
                 self.x = x
                 self.y = y
@@ -158,7 +156,7 @@ class Controller():
 
     def get_title(self):
         """Makes the title for the Window"""
-        if self.model.get_dirty():
+        if self.model.dirty:
             title = "*"
         else:
             title = " "
