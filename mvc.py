@@ -59,8 +59,7 @@ class Controller():
     def cmd_save(self):
 
         if self.get_filename() != "":  # if app already has a filename simply save else do save as
-            tg = TextGroup(self.model.graph,sys.stdout)
-            tg.show()
+            TextGroup(self.model.graph,sys.stdout).show()
         else:
             self.cmd_save_as()
 
@@ -79,10 +78,10 @@ class Controller():
                 self.model.set_dirty(False)
 
     def cmd_dirty(self):
-        self.cmd_set_dirty(True)
+        self.model.set_dirty(True)
 
     def cmd_clean(self):
-        self.cmd_set_dirty(False)
+        self.model.set_dirty(False)
 
     def cmd_exit(self):
         if self.model.get_dirty():
@@ -134,11 +133,7 @@ class Controller():
         self.view.info_box(self.__name, "Not yet implemented")
 
     def dirty_changed(self):
-        print("Dirty Changed")
         self.set_title()
-
-    def cmd_set_dirty(self, dirty):
-        self.model.set_dirty(dirty)
 
     def cmd_tools(self):
         self.stateTools = not self.stateTools
@@ -168,15 +163,21 @@ class Controller():
             title = " "
         title += " " + self.get_name()
         title += " - " + self.get_filename()
-        print("Title is %s" % title)
         return title
     
     def set_title(self):
-        """Sets the title of the Window"""
+        """Sets the title of the Window
+
+        This is tkinter specific and should be in View not controller
+        """
+
         self.root.title(self.get_title())
         
     def run(self):
-        """Starts the main program loop"""
+        """Starts the main program loop
+
+        This is tkinter specific and should be in View not controller
+        """
         self.root.mainloop()  # This is tkinter specific
 
 # Main program
