@@ -1,16 +1,16 @@
-from tkinter import filedialog, Frame, Menu, BOTH, YES, RAISED, Button, TOP, LEFT, Y, messagebox
+from tkinter import Tk, filedialog, Frame, Menu, BOTH, YES, RAISED, Button, TOP, LEFT, Y, messagebox
 from PIL import Image, ImageTk
 
 
 class View():
     """This calls contains all the tkinter specific code"""
 
-    def __init__(self, control, master):
+    def __init__(self, control):
         """View constructor"""
         self.control = control  # Link back to talk to controller
-        self.master = master
-        master.wm_state('zoomed')  # Full screen. Might not work on Mac
-        self.frame = Frame(master)
+        self.master = Tk()
+        self.master.wm_state('zoomed')  # Full screen. Might not work on Mac
+        self.frame = Frame(self.master)
 
         self.context = None
 
@@ -22,6 +22,19 @@ class View():
         self.frame.focus_set()
         
         self.create_events()
+
+    def run(self):
+        """Start tkinter"""
+        self.master.mainloop()
+
+    def exit(self):
+        self.master.destroy()
+
+    def set_title(self, title):
+        """Set Window title"""
+        print("View.set_tile('%s')" % title)
+        print("Master is ", self.master)
+        self.master.title(title)
 
     def create_menus(self):
         """creates the menus"""
