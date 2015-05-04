@@ -12,13 +12,14 @@ import sys
 class Controller():
     """This contains the business logic of the application"""
 
-    def __init__(self):
+    def __init__(self, name):
         """Constructor"""
         self.root = Tk()
-        self.model = Model()
+        self.model = Model(self)
         self.view = View(self, self.root)
-        self.__name = ""
-        self.__filename = ""
+        self.__name = name
+        self.__filename = ""  # Can't use setter here 'cos Python needs to declare __filename member
+        self.set_title()  # Call set title because __name & __filename have been changed without setters
         self.stateTools = True
         self.mode = "SELECT"
         self.step = 0
@@ -30,13 +31,20 @@ class Controller():
 
     def set_name(self, name):
         self.__name = name
+        self.set_title()  # Every time the application name changes reset the window title
+
+    def get_filename(self):
+        return self.__filename
+
+    def set_filename(self, filename):
+        self.__filename = filename
+        self.set_title()  # Every time the filename changed reset the window title
 
     def cmd_new(self):
         if self.model.get_dirty():
             self.cmd_save()
         self.model = Model()
-        self.__filename = ""
-        self.set_title()
+        self.set_filename("")
             
     
     def cmd_open(self):
@@ -44,13 +52,13 @@ class Controller():
             '''App has unsaved data so ask user to save it'''
             if self.view.question_box(self.__name, "Do you want to save your work?"):
                 self.cmd_save()
-        self.__filename = self.view.open_file_dialog()
-        if self.__filename != "":
-            self.set_title()
+        filename = self.view.open_file_dialog()
+        if filename != "":
+            self.set_filename(filename)
 
     def cmd_save(self):
 
-        if self.__filename != "":  # if app already has a filename simply save else do save as
+        if self.get_filename() != "":  # if app already has a filename simply save else do save as
             tg = TextGroup(self.model.graph,sys.stdout)
             tg.show()
         else:
@@ -66,10 +74,9 @@ class Controller():
                 # self.model.save(filename)
                 tg=TextGroup(self.model.graph, file)
                 tg.show()
-                self.__filename = file.name
+                self.set_filename(file.name)
                 file.close()
                 self.model.set_dirty(False)
-                self.set_title()
 
     def cmd_dirty(self):
         self.cmd_set_dirty(True)
@@ -121,16 +128,17 @@ class Controller():
                 self.step = 0
 
     def cmd_right_click(self, x, y):
-        # self.view.info_box("User pressed","x %d, y %d" % (x,y))
         self.view.show_context_menu(x, y)
 
     def cmd_null(self):
         self.view.info_box(self.__name, "Not yet implemented")
 
-    def cmd_set_dirty(self, dirty):
-        print("Setting dirty ",dirty)
-        self.model.set_dirty(dirty)
+    def dirty_changed(self):
+        print("Dirty Changed")
         self.set_title()
+
+    def cmd_set_dirty(self, dirty):
+        self.model.set_dirty(dirty)
 
     def cmd_tools(self):
         self.stateTools = not self.stateTools
@@ -158,19 +166,19 @@ class Controller():
             title = "*"
         else:
             title = " "
-        title += self.__name
-        title += " - " + self.__filename
+        title += " " + self.get_name()
+        title += " - " + self.get_filename()
         print("Title is %s" % title)
         return title
     
     def set_title(self):
+        """Sets the title of the Window"""
         self.root.title(self.get_title())
         
     def run(self):
-        self.set_title()
+        """Starts the main program loop"""
         self.root.mainloop()  # This is tkinter specific
 
 # Main program
-controller = Controller()
-controller.set_name("My MVC GUI")
+controller = Controller("My MVC GUI")
 controller.run()

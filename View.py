@@ -12,6 +12,8 @@ class View():
         master.wm_state('zoomed')  # Full screen. Might not work on Mac
         self.frame = Frame(master)
 
+        self.context = None
+
         self.create_menus()
         self.create_context_menus()
         self.create_toolbar()
@@ -91,6 +93,7 @@ class View():
         menubar.add_cascade(label="Help", menu = helpmenu)
 
         self.master.config(menu=menubar)  # lock in menubar
+
 
     def create_context_menus(self):
         """Creates the connects menus, i.e. for right click"""

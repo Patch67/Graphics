@@ -21,13 +21,14 @@ class Model():
     def set_dirty(self, dirty):
         """Setter for dirty
 
-        If dirt has changed will inform controller
-        by calling controller.dirty_changed
+        If dirty has changed will inform controller
+        by calling controller.dirty_changed.
+        This is needed because Window title bar has '*' dependant upon  model.__dirty
         """
 
-        if dirty != self.__dirty:
-            self.controller.dirty_changed()
-        self.__dirty = dirty
+        if dirty != self.__dirty:  # Only change if new value is different
+            self.__dirty = dirty  # Change value
+            self.controller.dirty_changed()  # Notify Controller that value changed
 
     def get_dirty(self):
         """Getter for __dirty"""
