@@ -71,8 +71,7 @@ class Controller():
         else:
             if file:  # if valid file
                 # self.model.save(filename)
-                tg=TextGroup(self.model.graph, file)
-                tg.show()
+                TextGroup(self.model.graph, file).show()
                 self.set_filename(file.name)
                 file.close()
                 self.model.set_dirty(False)
