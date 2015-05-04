@@ -32,8 +32,6 @@ class View():
 
     def set_title(self, title):
         """Set Window title"""
-        print("View.set_tile('%s')" % title)
-        print("Master is ", self.master)
         self.master.title(title)
 
     def create_menus(self):

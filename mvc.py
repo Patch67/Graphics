@@ -1,8 +1,5 @@
-"""
-tkinter MVC
-"""
+""" Controller """
 
-from tkinter import Tk
 from Model import *
 from View import *
 from TextGraph import TextGroup
@@ -14,9 +11,8 @@ class Controller():
 
     def __init__(self, name):
         """Constructor"""
-        self.root = Tk()
         self.model = Model(self)
-        self.view = View(self, self.root)
+        self.view = View(self)
         self.__name = name
         self.__filename = ""  # Can't use setter here 'cos Python needs to declare __filename member
         self.set_title()  # Call set title because __name & __filename have been changed without setters
@@ -25,6 +21,7 @@ class Controller():
         self.step = 0
         self.x = 0  # Previous click coords
         self.y = 0  # Previous click coords
+        self.view.run()  # Start the GUI
 
     '''Accessors'''
 
@@ -59,7 +56,7 @@ class Controller():
         if self.model.get_dirty():  # App has unsaved data so ask user to save it
 
             if self.view.question_box(self.__name, "Do you want to save your work?"):
-                self.cmd_save()
+                self.cmd_open()
         filename = self.view.open_file_dialog()
         if filename != "":  # if user does not press Cancel in response to open file dialog
             self.set_filename(filename)
@@ -75,7 +72,7 @@ class Controller():
         try:
             file = self.view.save_file_dialog(self.__filename)
         except IOError:
-            self.view.warning_box(self.__name, "Can't open file %s" % self.__filename)
+            self.view.warning_box(self.__name, "Can't access file %s" % self.__filename)
         else:
             if file:  # if valid file
                 # self.model.save(filename)
@@ -88,7 +85,7 @@ class Controller():
         if self.model.get_dirty():
             if self.view.question_box(self.__name, "Do you want to save your work?"):
                 self.cmd_save()
-        self.root.destroy()  # This is tkinter specific
+        self.view.exit()  # Exit the application
 
     def cmd_dirty(self):
         """Called from context menu"""
@@ -170,20 +167,9 @@ class Controller():
         return title
     
     def set_title(self):
-        """Sets the title of the Window
-
-        This is tkinter specific and should be in View not Controller
-        """
-
-        self.root.title(self.get_title())
-        
-    def run(self):
-        """Starts the main program loop
-
-        This is tkinter specific and should be in View not controller
-        """
-        self.root.mainloop()  # This is tkinter specific
+        """Sets the title of the Window"""
+        self.view.set_title(self.get_title())
 
 # Main program
-controller = Controller("My MVC GUI")
-controller.run()
+controller = Controller("My MVC GUI")  # Construct a controller
+controller.view.run()  # Start the GUI
