@@ -89,9 +89,6 @@ class Controller():
                 self.cmd_save()
         self.root.destroy()  # This is tkinter specific
 
-    def cmd_toolbar(self):
-        self.view.hide_toolbar()
-
     def cmd_left_click(self, x, y):
         if self.mode == "LINE":
             if self.step == 0:
