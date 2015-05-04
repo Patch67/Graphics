@@ -42,6 +42,11 @@ class Controller():
         self.__filename = filename
         self.set_title()  # Every time the filename changed reset the window title
 
+    '''System Events'''
+    def dirty_changed(self):
+        """Called by Model whenever dirty changes"""
+        self.set_title()
+
     '''Commands - Responses to GUI events'''
 
     def cmd_new(self):
@@ -49,11 +54,10 @@ class Controller():
             self.cmd_save()
         self.model = Model(self)
         self.set_filename("")
-            
-    
+
     def cmd_open(self):
-        if self.model.get_dirty():
-            '''App has unsaved data so ask user to save it'''
+        if self.model.get_dirty():  # App has unsaved data so ask user to save it
+
             if self.view.question_box(self.__name, "Do you want to save your work?"):
                 self.cmd_save()
         filename = self.view.open_file_dialog()
@@ -62,7 +66,6 @@ class Controller():
             '''Open file code goes here'''
 
     def cmd_save(self):
-
         if self.get_filename() != "":  # if app already has a filename simply save else do save as
             TextGroup(self.model.graph,sys.stdout).show()
         else:
@@ -81,17 +84,19 @@ class Controller():
                 file.close()
                 self.model.set_dirty(False)
 
-    def cmd_dirty(self):
-        self.model.set_dirty(True)
-
-    def cmd_clean(self):
-        self.model.set_dirty(False)
-
     def cmd_exit(self):
         if self.model.get_dirty():
             if self.view.question_box(self.__name, "Do you want to save your work?"):
                 self.cmd_save()
         self.root.destroy()  # This is tkinter specific
+
+    def cmd_dirty(self):
+        """Called from context menu"""
+        self.model.set_dirty(True)
+
+    def cmd_clean(self):
+        """Called from context menu"""
+        self.model.set_dirty(False)
 
     def cmd_left_click(self, x, y):
         if self.mode == "LINE":
@@ -133,10 +138,8 @@ class Controller():
     def cmd_null(self):
         self.view.info_box(self.__name, "Not yet implemented")
 
-    def dirty_changed(self):
-        self.set_title()
-
     def cmd_tools(self):
+        """Show / hide the toolbar"""
         self.stateTools = not self.stateTools
         if self.stateTools:
             self.view.show_toolbar()
@@ -169,7 +172,7 @@ class Controller():
     def set_title(self):
         """Sets the title of the Window
 
-        This is tkinter specific and should be in View not controller
+        This is tkinter specific and should be in View not Controller
         """
 
         self.root.title(self.get_title())
