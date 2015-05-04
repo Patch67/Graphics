@@ -26,6 +26,8 @@ class Controller():
         self.x = 0  # Previous click coords
         self.y = 0  # Previous click coords
 
+    '''Accessors'''
+
     def get_name(self):
         return self.__name
 
@@ -40,10 +42,12 @@ class Controller():
         self.__filename = filename
         self.set_title()  # Every time the filename changed reset the window title
 
+    '''Commands - Responses to GUI events'''
+
     def cmd_new(self):
         if self.model.get_dirty():
             self.cmd_save()
-        self.model = Model()
+        self.model = Model(self)
         self.set_filename("")
             
     
@@ -53,8 +57,9 @@ class Controller():
             if self.view.question_box(self.__name, "Do you want to save your work?"):
                 self.cmd_save()
         filename = self.view.open_file_dialog()
-        if filename != "":
+        if filename != "":  # if user does not press Cancel in response to open file dialog
             self.set_filename(filename)
+            '''Open file code goes here'''
 
     def cmd_save(self):
 

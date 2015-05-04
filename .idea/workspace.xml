@@ -27,8 +27,8 @@
       <file leaf-file-name="mvc.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/mvc.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.33450088" vertical-offset="863" max-vertical-offset="3179">
-              <caret line="62" column="13" selection-start-line="62" selection-start-column="13" selection-end-line="62" selection-end-column="13" />
+            <state vertical-scroll-proportion="0.31523642" vertical-offset="653" max-vertical-offset="3264">
+              <caret line="49" column="31" selection-start-line="49" selection-start-column="31" selection-end-line="49" selection-end-column="31" />
               <folding>
                 <element signature="e#21#43#0" expanded="true" />
               </folding>
@@ -753,8 +753,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/mvc.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.33450088" vertical-offset="863" max-vertical-offset="3179">
-          <caret line="62" column="13" selection-start-line="62" selection-start-column="13" selection-end-line="62" selection-end-column="13" />
+        <state vertical-scroll-proportion="0.31523642" vertical-offset="653" max-vertical-offset="3264">
+          <caret line="49" column="31" selection-start-line="49" selection-start-column="31" selection-end-line="49" selection-end-column="31" />
           <folding>
             <element signature="e#21#43#0" expanded="true" />
           </folding>
