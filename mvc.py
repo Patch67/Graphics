@@ -66,7 +66,10 @@ class Controller():
 
     def cmd_save(self):
         if self.filename != "":  # if app already has a filename simply save else do save as
-            TextGroup(self.model.graph,sys.stdout).show()
+            #TextGroup(self.model.graph,sys.stdout).show()
+            file = open(self.filename, "w")
+            self.model.graph.save(file)
+            file.close()
         else:
             self.cmd_save_as()
 

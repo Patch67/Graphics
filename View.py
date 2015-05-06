@@ -103,6 +103,17 @@ class View():
                              command = self.control.cmd_null)
         menubar.add_cascade(label="Help", menu = helpmenu)
 
+        '''Experimental toolbar stuff'''
+        xtools = Menu(menubar, tearoff=1)
+        xtools.add_command(label="Select", command=self.control.cmd_null)
+        xtools.add_command(label="Line", command=self.control.cmd_line)
+        xtools.add_command(label="Rectangle", command=self.control.cmd_rectangle)
+        xtools.add_command(label="Circle", command=self.control.cmd_circle)
+        xtools.add_command(label="PLine", command=self.control.cmd_null)
+        xtools.add_command(label="Group", command=self.control.cmd_null)
+        xtools.add_command(label="Instance", command=self.control.cmd_null)
+        menubar.add_cascade(label = "Tools", menu = xtools)
+
         self.master.config(menu=menubar)  # lock in menubar
 
 
