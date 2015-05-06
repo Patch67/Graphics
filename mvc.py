@@ -23,19 +23,21 @@ class Controller():
         self.y = 0  # Previous click coords
         self.view.run()  # Start the GUI
 
-    '''Accessors'''
-
-    def get_name(self):
+    @property
+    def name(self):
         return self.__name
 
+    @name.setter
     def set_name(self, name):
         self.__name = name
         self.set_title()  # Every time the application name changes reset the window title
 
-    def get_filename(self):
+    @property
+    def filename(self):
         return self.__filename
 
-    def set_filename(self, filename):
+    @filename.setter
+    def filename(self, filename):
         self.__filename = filename
         self.set_title()  # Every time the filename changed reset the window title
 
@@ -50,40 +52,40 @@ class Controller():
         if self.model.dirty:
             self.cmd_save()
         self.model = Model(self)
-        self.set_filename("")
+        self.filename = ""
 
     def cmd_open(self):
         if self.model.dirty:  # App has unsaved data so ask user to save it
 
-            if self.view.question_box(self.__name, "Do you want to save your work?"):
+            if self.view.question_box(self.name, "Do you want to save your work?"):
                 self.cmd_open()
         filename = self.view.open_file_dialog()
         if filename != "":  # if user does not press Cancel in response to open file dialog
-            self.set_filename(filename)
+            self.filename = filename
             '''Open file code goes here'''
 
     def cmd_save(self):
-        if self.get_filename() != "":  # if app already has a filename simply save else do save as
+        if self.filename != "":  # if app already has a filename simply save else do save as
             TextGroup(self.model.graph,sys.stdout).show()
         else:
             self.cmd_save_as()
 
     def cmd_save_as(self):
         try:
-            file = self.view.save_file_dialog(self.__filename)
+            file = self.view.save_file_dialog(self.filename)
         except IOError:
-            self.view.warning_box(self.__name, "Can't access file %s" % self.__filename)
+            self.view.warning_box(self.name, "Can't access file %s" % self.filename)
         else:
             if file:  # if valid file
                 # self.model.save(filename)
                 TextGroup(self.model.graph, file).show()
-                self.set_filename(file.name)
+                self.filename = file.name
                 file.close()
                 self.model.dirty = False
 
     def cmd_exit(self):
         if self.model.dirty:
-            if self.view.question_box(self.__name, "Do you want to save your work?"):
+            if self.view.question_box(self.name, "Do you want to save your work?"):
                 self.cmd_save()
         self.view.exit()  # Exit the application
 
@@ -131,7 +133,7 @@ class Controller():
         self.view.show_context_menu(x, y)
 
     def cmd_null(self):
-        self.view.info_box(self.__name, "Not yet implemented")
+        self.view.info_box(self.name, "Not yet implemented")
 
     def cmd_tools(self):
         """Show / hide the toolbar"""
@@ -160,8 +162,8 @@ class Controller():
             title = "*"
         else:
             title = " "
-        title += " " + self.get_name()
-        title += " - " + self.get_filename()
+        title += " " + self.name
+        title += " - " + self.filename
         return title
     
     def set_title(self):

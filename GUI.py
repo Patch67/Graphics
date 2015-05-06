@@ -7,30 +7,36 @@ class Application():
         self.menus = []
         self.toolbars = []
 
-    def get_name(self):
+    @property
+    def name(self):
         return self.__name
 
+    @name.setter
     def set_name(self, name):
         self.__name = name
 
+    @staticmethod
     def create_data_class(self, dir):
         file = open(dir + "\data.py","w")
         file.write("'''The Data Class'''\n")
         file.write("#GUIWikiPy\n")
         file.close()
 
+    @staticmethod
     def create_GUI_class(self, dir):
         file = open(dir + "\GUI.py","w")
         file.write("'''The GUI Class'''\n")
         file.write("#GUIWikiPy\n")
         file.close()
 
+    @staticmethod
     def create_command_class(self, dir):
         file = open(dir + "\\command.py","w")
         file.write("'''The Command Class'''\n")
         file.write("#GUIWikiPy\n")
         file.close()
 
+    @staticmethod
     def create_user_command_class(self, dir):
         file = open(dir + "/User.py","w")
         file.write("'''The User Command Class'''\n")
@@ -48,23 +54,28 @@ class Menu():
     def __init__(self):
         self.__name = ""
 
-    def get_name(self):
+    @property
+    def name(self):
         return self.__name
 
-    def set_name(self, name):
+    @name.setter
+    def name(self, name):
         self.__name = name
 
     def write(self, filename):
+        pass
 
 
 class Toolbar():
     def __init__(self):
         self.__name = ""
 
-    def get_name(self):
+    @property
+    def name(self):
         return self.__name
 
-    def set_name(self, name):
+    @name.setter
+    def name(self, name):
         self.__name = name
 
 
