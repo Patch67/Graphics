@@ -1,6 +1,6 @@
-from tkinter import Tk, filedialog, Frame, Menu, BOTH, YES, RAISED, Button, TOP, LEFT, Y, messagebox
+from tkinter import Tk, filedialog, Frame, Canvas, Menu, BOTH, YES, RAISED, Button, TOP, LEFT, Y, messagebox
 from PIL import Image, ImageTk
-
+from Graph import *
 
 class View():
     """This calls contains all the tkinter specific code"""
@@ -12,6 +12,9 @@ class View():
         self.master.wm_state('zoomed')  # Full screen. Might not work on Mac
         self.frame = Frame(self.master)
 
+        self.canvas = Canvas(self)
+        self.canvas.pack(fill=BOTH, expand=1)
+
         self.context = None
 
         self.create_menus()
@@ -22,6 +25,8 @@ class View():
         self.frame.focus_set()
         
         self.create_events()
+
+        self.graph = Graph("Main")
 
     def run(self):
         """Start tkinter"""
@@ -156,13 +161,18 @@ class View():
         self.frame.bind("<Button-1>", self.left_click)
         self.frame.bind("<Button-3>", self.right_click)
         self.frame.bind("<Configure>", self.on_resize)
-
+        self.frame.bind("<Motion>", self.on_move)
         # Window closing event
         self.master.protocol('WM_DELETE_WINDOW', self.control.cmd_exit)
 
-    def on_resize(self,e):
+    def on_resize(self, e):
         """Called when window changes size"""
         pass
+
+    def on_move(self, e):
+        """Called when mouse moves"""
+        pass
+
 
     @staticmethod
     def question_box(title, text):
@@ -200,7 +210,7 @@ class View():
 
     def left_click(self, e):
         self.control.cmd_left_click(e.x_root, e.y_root)
-
+        self.draw_group(self.graph)
 
     def right_click(self, e):
         self.control.cmd_right_click(e.x_root, e.y_root)
@@ -209,8 +219,6 @@ class View():
         self.context.tk_popup(x, y, 0)
 
     def show_toolbar(self):
-        # self.frame = Frame(self.master)
-
         self.create_menus()
         self.create_context_menus()
         self.create_toolbar()
@@ -218,8 +226,34 @@ class View():
         self.create_toolbar()
         self.frame.pack(fill=BOTH, expand=YES)
         self.frame.focus_set()
-        
         self.create_events()
 
     def hide_toolbar(self):
         self.toolbar.pack_forget()
+
+    ''' View methods to draw Graph objects'''
+    def temp_line(self, temp_line):
+        pass
+
+    def draw_line(self, line):
+        self.graph.
+        self.canvas.create_line(line.x0, line.y0, line.x1, line.y1)
+
+    def temp_circle(self, circle):
+        pass
+
+    def draw_circle(self, circle):
+        self.canvas.create_arc(circle.x, circle.y, circle.x + circle.r, circle.y,0, 360)
+
+    def temp_rectangle(self, temp_rectangle):
+        pass
+
+    def draw_rectangle(self, rectangle):
+        pass
+
+    def temp_group(self, temp_group):
+        pass
+
+    def draw_group(self, group):
+        for child in group.children:
+            print(child.__type__)
