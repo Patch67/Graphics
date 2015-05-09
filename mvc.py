@@ -46,7 +46,7 @@ class Controller():
     def dirty_changed(self):
         """Called by Model whenever dirty changes"""
         self.set_title()
-        self.view.draw_group(self.model.graph)
+        self.view.draw_group(self.model.graph)  # In tkinter graphics objects are permanent so don't need redraw
 
     '''Commands - Responses to GUI events'''
 
@@ -104,6 +104,8 @@ class Controller():
 
     def cmd_left_click(self, x, y):
         """Called when user clicks left mouse button"""
+        # Raw mouse coordinates must be translated into frame relative coordinates
+        print("Click at %d, %d)" % (x,y))
         if self.mode == "LINE":
             if self.step == 0:
                 self.x = x

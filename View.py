@@ -1,4 +1,4 @@
-from tkinter import Tk, filedialog, Canvas, Menu, Frame, BOTH, YES, RAISED, Button, TOP, LEFT, Y, messagebox
+from tkinter import Tk, filedialog, Canvas, Menu, Frame, BOTH, YES, RAISED, Button, TOP, LEFT, Y, messagebox, ARC
 from PIL import Image, ImageTk
 from Graph import *
 
@@ -178,10 +178,13 @@ class View():
         self.control.cmd_open()
 
     def left_click(self, e):
-        self.control.cmd_left_click(e.x_root, e.y_root)
+        # Translate raw mouse clicks into canvas relative coordinates
+        x = self.canvas.canvasx(e.x)
+        y = self.canvas.canvasy(e.y)
+        self.control.cmd_left_click(x, y)
 
     def right_click(self, e):
-        self.control.cmd_right_click(e.x_root, e.y_root)
+        self.control.cmd_right_click(e.x, e.y)  # Note: There are raw screen coordinates not window relative
         
     def show_context_menu(self, x, y):
         self.context.tk_popup(x, y, 0)
@@ -204,31 +207,40 @@ class View():
         pass
 
     def draw_line(self, line):
-        self.canvas.create_line([line.x0, line.y0, line.x1, line.y1])
+        self.canvas.create_line(line.x0, line.y0, line.x1, line.y1, fill="#476042")
+        print("Drawing a line")
 
     def temp_circle(self, circle):
         pass
 
     def draw_circle(self, circle):
-        self.canvas.create_arc([circle.x, circle.y, circle.x + circle.r, circle.y], 0, 360)
+        print("Drawing a circle %d, %d, %d, %d" % (circle.x, circle.y, circle.x + circle.r, circle.y))
+        self.canvas.create_arc(circle.x, circle.y, circle.x + circle.r, circle.y, style=ARC)
 
     def temp_rectangle(self, temp_rectangle):
         pass
 
     def draw_rectangle(self, rectangle):
-        pass
+        self.canvas.create_line(rectangle.x0, rectangle.y0, rectangle.x1, rectangle.y0)  # Right
+        self.canvas.create_line(rectangle.x1, rectangle.y0, rectangle.x1, rectangle.y1)  # Up
+        self.canvas.create_line(rectangle.x1, rectangle.y1, rectangle.x0, rectangle.y1)  # Left
+        self.canvas.create_line(rectangle.x0, rectangle.y1, rectangle.x0, rectangle.y0)  # Down
 
     def temp_group(self, temp_group):
         pass
 
     def draw_group(self, group):
+        print("Drawing group %s" % group.name)
         for child in group.children:
-            t = (type(child).__name__)
+            t = type(child).__name__
             if t == "Line":
+                print("Draw a line")
                 self.draw_line(child)
             elif t == "Circle":
+                print("Draw a circle")
                 self.draw_circle(child)
             elif t == "Rectangle":
+                print("Draw a rectangle")
                 self.draw_rectangle(child)
 
 
