@@ -41,3 +41,14 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+
+#  ================================
+Patrick
+#  ================================
+#  ignore py cache crap
+__pycache__
+#  ignore pycharms settings
+.idea
+#  ignore sas data files as these are just working files not really needed
+sas
+sas*.*
