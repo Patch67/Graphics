@@ -3,6 +3,7 @@
 from Model import *
 from View import *
 from TextGraph import TextGroup
+from math import sqrt
 import sys
 
 
@@ -45,6 +46,7 @@ class Controller():
     def dirty_changed(self):
         """Called by Model whenever dirty changes"""
         self.set_title()
+        self.view.draw_group(self.model.graph)
 
     '''Commands - Responses to GUI events'''
 
@@ -118,6 +120,10 @@ class Controller():
                 self.y = y
                 self.step += 1
             else:
+                dx = self.x - x
+                dy = self.y - y
+                radius = sqrt(dx*dx + dy*dy)
+                self.model.add_circle(self.x, self.y, radius)
                 self.x = x
                 self.y = y
                 self.step = 0

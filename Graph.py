@@ -1,5 +1,8 @@
 """ Contains Graphics classes based on Compound design pattern
 
+This is a model component of the MVC application design.
+As such it houses all the data related classes for Graphics elements
+
 Patrick Biggs
 20th April 2015
 """
