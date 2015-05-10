@@ -10,8 +10,8 @@ Patrick Biggs
 import abc
 
 
-# Abstract Base class
 class Graph:
+    """ Abstract base class from which all graphics object derive"""
     __metaclass__ = abc.ABCMeta
     
     @abc.abstractmethod
@@ -26,9 +26,13 @@ class Graph:
     def to_gcode(self, file):
         pass
 
+    # TODO: Add other export options such as SVG, DXF, PDF, etc.
 
-# Concrete Classes
+
 class Line(Graph):
+    """ Concrete class for graphics lines
+    Based on the MVC architectural pattern so only for data handling, not actually drawing
+    """
     def __init__(self, x0, y0, x1, y1):
         self.x0 = x0
         self.y0 = y0
@@ -44,6 +48,9 @@ class Line(Graph):
 
 
 class Circle(Graph):
+    """ Concrete class for graphics circles
+    Based on the MVC architectural pattern so only for data handling, not actually drawing
+    """
     def __init__(self, x, y, r):
         self.x = x
         self.y = y
@@ -57,6 +64,9 @@ class Circle(Graph):
 
 
 class Rectangle(Graph):
+    """ Concrete class for graphics rectangles
+    Based on the MVC architectural pattern so only for data handling, not actually drawing
+    """
     def __init__(self, x0, y0, x1, y1):
         self.x0 = x0
         self.y0 = y0
@@ -75,6 +85,10 @@ class Rectangle(Graph):
 
 
 class Text(Graph):
+    """ Concrete class for graphics text
+    Based on the MVC architectural pattern so only for data handling, not actually drawing
+    """
+
     def __init__(self, x, y, text):
         self.x = x
         self.y = y
@@ -87,8 +101,12 @@ class Text(Graph):
         file.write("(Text is %s)\n" % self.text)
 
 
-# Implements the composite pattern
 class Group(Graph):
+    """ Concrete class for graphics group
+    Implements the composite pattern
+    Based on the MVC architectural pattern so only for data handling, not actually drawing
+    """
+
     def __init__(self,name):
         self.name = name
         self.children=[]

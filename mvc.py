@@ -57,17 +57,15 @@ class Controller():
 
     def cmd_open(self):
         if self.model.dirty:  # App has unsaved data so ask user to save it
-
             if self.view.question_box(self.name, "Do you want to save your work?"):
                 self.cmd_open()
         filename = self.view.open_file_dialog()
         if filename != "":  # if user does not press Cancel in response to open file dialog
             self.filename = filename
-            '''Open file code goes here'''
+            # TODO: Put open code here
 
     def cmd_save(self):
         if self.filename != "":  # if app already has a filename simply save else do save as
-            #TextGroup(self.model.graph,sys.stdout).show()
             file = open(self.filename, "w")
             self.model.graph.save(file)
             file.close()
@@ -94,17 +92,22 @@ class Controller():
         self.view.exit()  # Exit the application
 
     def cmd_dirty(self):
+        # TODO: Remove this code
         """Called from context menu"""
         self.model.dirty = True
 
     def cmd_clean(self):
+        # TODO: Remove this code
         """Called from context menu"""
         self.model.dirty = False
 
     def cmd_left_click(self, x, y):
+        # TODO: Investigate snap controls; Snap_to end_point, mid_point, in_line_with, grid
         """Called when user clicks left mouse button
-        Note coordinates are windows relative, so top left corner of window is 0,0 wherever the window is no screen.
+        Note coordinates are windows relative, so top left corner of window is 0,0 wherever the window is on screen.
         """
+        # TODO: Look at making a Mode class to eliminate all these if self.mode clauses
+        # TODO: Add code for Select
         if self.mode == "LINE":
             if not self.view.temp:
                 self.view.temp = TempLine(self.view, x, y)  # Create the temp object
@@ -117,6 +120,7 @@ class Controller():
                 self.x = x
                 self.y = y
         elif self.mode == "CIRCLE":
+            # TODO: Make circle via centre, radius as well as corner, corner
             if not self.view.temp:
                 self.view.temp = TempCircle(self.view, x, y)  # Create the temp object
                 self.x = x
@@ -141,6 +145,8 @@ class Controller():
                 self.model.add_rectangle(self.x, self.y, x, y)
                 self.x = x
                 self.y = y
+        # TODO: Add code for poly line
+        # TODO: Add code for polygon
 
     def cmd_right_click(self, x, y):
         self.view.show_context_menu(x, y)

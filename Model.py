@@ -42,4 +42,18 @@ class Model():
         self.graph.add(Circle(x, y, r))
         self.dirty = True
 
+    def add_poly_line(self):
+        # TODO: Add polyline
+        pass
 
+    def add_polygon(self):
+        # TODO: Add polygon
+        pass
+
+    def add_group(self):
+        # TODO: Add code for group
+        pass
+
+    def add_instance(self, x, y):
+        # TODO: Add code for instance
+        pass

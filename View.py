@@ -1,6 +1,5 @@
 from tkinter import Tk, filedialog, Canvas, Menu, Frame, BOTH, YES, RAISED, Button, TOP, LEFT, Y, messagebox, ARC
 from PIL import Image, ImageTk
-#from Graph import *
 
 
 class View():
@@ -12,7 +11,6 @@ class View():
         self.master = Tk()
         self.master.wm_state('zoomed')  # Full screen. Might not work on Mac
         self.canvas = Canvas(self.master)  # Changed frame to Canvas so I can draw graphics on it.
-
 
         self.tool_bar = None  # Holder for tool bar to come later
         self.temp = None  # This is for a Temp object when drawing a graphics object is under construction
@@ -28,10 +26,11 @@ class View():
         self.create_events()
 
     def run(self):
-        """Start tkinter"""
+        """Start the application (tkinter)"""
         self.master.mainloop()
 
     def exit(self):
+        """Quit the application"""
         self.master.destroy()
 
     def set_title(self, title):
@@ -103,11 +102,14 @@ class View():
     def create_context_menus(self):
         """Creates the connects menus, i.e. for right click"""
         self.context = Menu(self.master, tearoff=0)
+        # TODO: Add more options such as cut, copy, paste, rotate, scale, etc.
         self.context.add_command(label="Dirty", command=self.control.cmd_dirty)
         self.context.add_command(label="Clean", command=self.control.cmd_clean)
 
     def create_toolbar(self):
-        """Creates toolbar, hopefully floating dockable but not yet"""
+        """Creates toolbar"""
+        # TODO: Make this a floating, dockable tool bar with a menu option to show / hide
+        # TODO: Make config file to save current status, Floating, Hidden, Dock_top, dock_bottom, dock_left, dock_right
         self.tool_bar = Frame(self.master, bd=1, relief=RAISED)
 
         self.img = Image.open("exit.png")
@@ -142,8 +144,9 @@ class View():
         pass
 
     def on_move(self, e):
-        if self.temp:
-            self.temp.mouse_move(e.x, e.y)
+        """Called when mouse moves"""
+        if self.temp:  # if there is a graphics operation in progress
+            self.temp.mouse_move(e.x, e.y)  # tell the graphics operation about the mouse move
 
 
     @staticmethod
@@ -190,6 +193,7 @@ class View():
         self.context.tk_popup(x, y, 0)
 
     def show_toolbar(self):
+        # TODO: Make this tool bar open in the right place every time, not just the first time
         self.create_menus()
         self.create_context_menus()
         self.create_toolbar()
@@ -229,7 +233,7 @@ class View():
         self.temp = None  # Clear the temp object.
 
     def make_group(self, group):
-        self.canvas.delete(self.canvas.find_all())  # TODO: Sort this out
+        self.canvas.delete(self.canvas.find_all())  # TODO: Sort this out. Do I need to delete them all every time?
         for child in group.children:
             t = type(child).__name__
             if t == "Line":
@@ -238,6 +242,7 @@ class View():
                 self.make_circle(child)
             elif t == "Rectangle":
                 self.make_rectangle(child)
+            # TODO: Add more options when more graphics objects are available
         self.temp = None  # Clear the temp object.
 
 
