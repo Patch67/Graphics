@@ -12,6 +12,9 @@ class View():
         self.master = Tk()
         self.master.wm_state('zoomed')  # Full screen. Might not work on Mac
         self.canvas = Canvas(self.master)  # Changed frame to Canvas so I can draw graphics on it.
+
+
+        self.tool_bar = None  # Holder for tool bar to come later
         self.temp = None  # This is for a Temp object when drawing a graphics object is under construction
         self.context = None
 
@@ -97,7 +100,6 @@ class View():
 
         self.master.config(menu=menu_bar)  # lock in menu_bar
 
-
     def create_context_menus(self):
         """Creates the connects menus, i.e. for right click"""
         self.context = Menu(self.master, tearoff=0)
@@ -106,24 +108,24 @@ class View():
 
     def create_toolbar(self):
         """Creates toolbar, hopefully floating dockable but not yet"""
-        self.toolbar = Frame(self.master, bd=1, relief=RAISED)
+        self.tool_bar = Frame(self.master, bd=1, relief=RAISED)
 
         self.img = Image.open("exit.png")
         eimg = ImageTk.PhotoImage(self.img)  
 
-        exitButton = Button(self.toolbar, image=eimg, bd=1, relief=RAISED, command=self.control.cmd_exit)
-        exitButton.image = eimg
-        exitButton.pack(side=TOP, padx=2, pady=2)
+        exit_button = Button(self.tool_bar, image=eimg, bd=1, relief=RAISED, command=self.control.cmd_exit)
+        exit_button.image = eimg
+        exit_button.pack(side=TOP, padx=2, pady=2)
 
-        anotherButton = Button(self.toolbar, image=eimg, bd=1, relief=RAISED, command=self.control.cmd_null)
-        anotherButton.image = eimg
-        anotherButton.pack(side=TOP, padx=2, pady=2)
+        another_button = Button(self.tool_bar, image=eimg, bd=1, relief=RAISED, command=self.control.cmd_null)
+        another_button.image = eimg
+        another_button.pack(side=TOP, padx=2, pady=2)
 
-        anotherButton = Button(self.toolbar, image=eimg, bd=1, relief=RAISED, command=self.control.cmd_null)
-        anotherButton.image = eimg
-        anotherButton.pack(side=TOP, padx=2, pady=2)
+        another_button = Button(self.tool_bar, image=eimg, bd=1, relief=RAISED, command=self.control.cmd_null)
+        another_button.image = eimg
+        another_button.pack(side=TOP, padx=2, pady=2)
 
-        self.toolbar.pack(side=LEFT, fill=Y)
+        self.tool_bar.pack(side=LEFT, fill=Y)
         
     def create_events(self):
         """Binds keyboard events to handlers"""
@@ -179,13 +181,10 @@ class View():
         self.control.cmd_open()
 
     def left_click(self, e):
-        # Translate raw mouse clicks into canvas relative coordinates
-        x = self.canvas.canvasx(e.x)
-        y = self.canvas.canvasy(e.y)
-        self.control.cmd_left_click(x, y)
+        self.control.cmd_left_click(e.x, e.y)  # e.x & e.y are canvas relative
 
     def right_click(self, e):
-        self.control.cmd_right_click(e.x, e.y)  # Note: There are raw screen coordinates not window relative
+        self.control.cmd_right_click(e.x_root, e.y_root)  # e.x_root & e.y_root are screen relative
         
     def show_context_menu(self, x, y):
         self.context.tk_popup(x, y, 0)
@@ -201,7 +200,7 @@ class View():
         self.create_events()
 
     def hide_toolbar(self):
-        self.toolbar.pack_forget()
+        self.tool_bar.pack_forget()
 
     ''' View methods to draw Graph objects'''
 
