@@ -46,6 +46,7 @@ Temporary Items
 Patrick
 #  ================================
 #  ignore py cache crap
+*.pyc
 __pycache__
 #  ignore pycharms settings
 .idea
