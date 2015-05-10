@@ -45,11 +45,11 @@ Temporary Items
 #  ================================
 Patrick
 #  ================================
-#  ignore py cache crap
-*.pyc
-__pycache__\*.*.pyc
+#  ignore __pycache__
+__pycache__/
+*.py[cod]
 #  ignore pycharms settings
-.idea
+.idea/
 #  ignore sas data files as these are just working files not really needed
 sas
 sas*.*
