@@ -47,7 +47,7 @@ Patrick
 #  ================================
 #  ignore py cache crap
 *.pyc
-__pycache__
+__pycache__\*.*.pyc
 #  ignore pycharms settings
 .idea
 #  ignore sas data files as these are just working files not really needed
