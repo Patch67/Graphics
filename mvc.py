@@ -4,7 +4,7 @@ from Model import *
 from View import *
 from TextGraph import TextGroup
 from math import sqrt
-import sys
+from Temp import TempLine, TempCircle, TempRectangle
 
 
 class Controller():
@@ -20,8 +20,8 @@ class Controller():
         self.stateTools = True
         self.mode = "SELECT"
         self.step = 0
-        self.x = 0  # Previous click coords
-        self.y = 0  # Previous click coords
+        self.x = 0  # Previous click coordinates
+        self.y = 0  # Previous click coordinates
         self.view.run()  # Start the GUI
 
     @property
@@ -46,7 +46,7 @@ class Controller():
     def dirty_changed(self):
         """Called by Model whenever dirty changes"""
         self.set_title()
-        self.view.draw_group(self.model.graph)  # In tkinter graphics objects are permanent so don't need redraw
+        self.view.redraw(self.model.graph)  # In tkinter graphics objects are permanent so no need to redraw
 
     '''Commands - Responses to GUI events'''
 
@@ -103,42 +103,45 @@ class Controller():
         self.model.dirty = False
 
     def cmd_left_click(self, x, y):
-        """Called when user clicks left mouse button"""
-        # Raw mouse coordinates must be translated into frame relative coordinates
-        print("Click at %d, %d)" % (x,y))
+        """Called when user clicks left mouse button
+        Note coordinates are windows relative, so top left corner of window is 0,0 wherever the window is no screen.
+        """
         if self.mode == "LINE":
-            if self.step == 0:
+            if not self.view.temp:
+                self.view.temp = TempLine(self.view, x, y)  # Create the temp object
                 self.x = x
                 self.y = y
-                self.step += 1
             else:
+                self.view.temp.close(x, y)  # Tell view to finish drawing object in progress
+                self.view.temp = None  # Kill the temp object
                 self.model.add_line(self.x, self.y, x, y)
                 self.x = x
                 self.y = y
-                self.step = 0
         elif self.mode == "CIRCLE":
-            if self.step ==0:
+            if not self.view.temp:
+                self.view.temp = TempCircle(self.view, x, y)  # Create the temp object
                 self.x = x
                 self.y = y
-                self.step += 1
             else:
+                self.view.temp.close(x, y)  # Tell view to finish drawing object in progress
+                self.view.temp = None  # Kill the temp object
                 dx = self.x - x
                 dy = self.y - y
                 radius = sqrt(dx*dx + dy*dy)
                 self.model.add_circle(self.x, self.y, radius)
                 self.x = x
                 self.y = y
-                self.step = 0
         elif self.mode == "RECTANGLE":
-            if self.step == 0:
+            if not self.view.temp:
+                self.view.temp = TempRectangle(self.view, x, y)
                 self.x = x
                 self.y = y
-                self.step += 1
             else:
+                self.view.temp.close(x, y)  # Tell view to finish drawing object in progress
+                self.view.temp = None  # Kill the temp object
                 self.model.add_rectangle(self.x, self.y, x, y)
                 self.x = x
                 self.y = y
-                self.step = 0
 
     def cmd_right_click(self, x, y):
         self.view.show_context_menu(x, y)
@@ -183,4 +186,4 @@ class Controller():
 
 # Main program
 controller = Controller("My MVC GUI")  # Construct a controller
-controller.view.run()  # Start the GUI
+

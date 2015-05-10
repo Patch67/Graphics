@@ -1,6 +1,7 @@
 from tkinter import Tk, filedialog, Canvas, Menu, Frame, BOTH, YES, RAISED, Button, TOP, LEFT, Y, messagebox, ARC
 from PIL import Image, ImageTk
-from Graph import *
+#from Graph import *
+
 
 class View():
     """This calls contains all the tkinter specific code"""
@@ -11,7 +12,7 @@ class View():
         self.master = Tk()
         self.master.wm_state('zoomed')  # Full screen. Might not work on Mac
         self.canvas = Canvas(self.master)  # Changed frame to Canvas so I can draw graphics on it.
-
+        self.temp = None  # This is for a Temp object when drawing a graphics object is under construction
         self.context = None
 
         self.create_menus()
@@ -139,8 +140,8 @@ class View():
         pass
 
     def on_move(self, e):
-        """Called when mouse moves"""
-        pass
+        if self.temp:
+            self.temp.mouse_move(e.x, e.y)
 
 
     @staticmethod
@@ -168,7 +169,7 @@ class View():
         """Just a wrapped for tkinter so command calls can be tkinter independent"""
         return filedialog.asksaveasfile(mode='w',
                                         initialfile=initial_file,
-                                        filetypes=(("Text","*.txt"),("Gcode","*.gcode"),("All files","*.*")),
+                                        filetypes=(("Text", "*.txt"),("Gcode", "*.gcode"),("All files", "*.*")),
                                         defaultextension=".txt")
 
     def key_open(self, e):
@@ -203,44 +204,41 @@ class View():
         self.toolbar.pack_forget()
 
     ''' View methods to draw Graph objects'''
-    def temp_line(self, temp_line):
-        pass
 
-    def draw_line(self, line):
+    def redraw(self, graph):
+        """In tkinter redraw is not needed because canvas graphics are permanent
+        In an application with transient graphics we would need to redraw all the objects
+        but tkinter canvas does this for us
+        """
+        self.temp = None
+        pass  # Do nothing
+
+    def make_line(self, line):
+        """Add a new, permanent, line to canvas"""
         self.canvas.create_line(line.x0, line.y0, line.x1, line.y1, fill="#476042")
-        print("Drawing a line")
+        self.temp = None  # Clear the temp object.
 
-    def temp_circle(self, circle):
-        pass
-
-    def draw_circle(self, circle):
+    def make_circle(self, circle):
+        """Add a new, permanent, circle to canvas"""
         print("Drawing a circle %d, %d, %d, %d" % (circle.x, circle.y, circle.x + circle.r, circle.y))
         self.canvas.create_arc(circle.x, circle.y, circle.x + circle.r, circle.y, style=ARC)
+        self.temp = None  # Clear the temp object.
 
-    def temp_rectangle(self, temp_rectangle):
-        pass
+    def make_rectangle(self, rectangle):
+        """Add a new, permanent, rectangle to canvas"""
+        self.canvas.create_rectangle(rectangle.x0, rectangle.y0, rectangle.x1, rectangle.y1)
+        self.temp = None  # Clear the temp object.
 
-    def draw_rectangle(self, rectangle):
-        self.canvas.create_line(rectangle.x0, rectangle.y0, rectangle.x1, rectangle.y0)  # Right
-        self.canvas.create_line(rectangle.x1, rectangle.y0, rectangle.x1, rectangle.y1)  # Up
-        self.canvas.create_line(rectangle.x1, rectangle.y1, rectangle.x0, rectangle.y1)  # Left
-        self.canvas.create_line(rectangle.x0, rectangle.y1, rectangle.x0, rectangle.y0)  # Down
-
-    def temp_group(self, temp_group):
-        pass
-
-    def draw_group(self, group):
-        print("Drawing group %s" % group.name)
+    def make_group(self, group):
+        self.canvas.delete(self.canvas.find_all())  # TODO: Sort this out
         for child in group.children:
             t = type(child).__name__
             if t == "Line":
-                print("Draw a line")
-                self.draw_line(child)
+                self.make_line(child)
             elif t == "Circle":
-                print("Draw a circle")
-                self.draw_circle(child)
+                self.make_circle(child)
             elif t == "Rectangle":
-                print("Draw a rectangle")
-                self.draw_rectangle(child)
+                self.make_rectangle(child)
+        self.temp = None  # Clear the temp object.
 
 
