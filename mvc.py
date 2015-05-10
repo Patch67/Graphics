@@ -19,7 +19,6 @@ class Controller():
         self.set_title()  # Call set title because __name & __filename have been changed without setters
         self.stateTools = True
         self.mode = "SELECT"
-        self.step = 0
         self.x = 0  # Previous click coordinates
         self.y = 0  # Previous click coordinates
         self.view.run()  # Start the GUI
@@ -160,15 +159,12 @@ class Controller():
     # Drawing Commands
     def cmd_line(self):
         self.mode = "LINE"
-        self.step = 0
 
     def cmd_circle(self):
         self.mode = "CIRCLE"
-        self.step = 0
         
     def cmd_rectangle(self):
         self.mode = "RECTANGLE"
-        self.step = 0
 
     def get_title(self):
         """Makes the title for the Window"""
