@@ -2,6 +2,7 @@ class Graphic():
     """Abstract class to base all grpahics classes on"""
     def __init__(self):
         pass
+
     def pick(x, y, d):
         pass
 
@@ -14,7 +15,6 @@ class Line(Graphic):
         self.y0 = y0
         self.x1 = x1
         self.y1 = y1
-
 
     def pick(self, x, y, d):
         """If start point, end point or mid point is within d units return

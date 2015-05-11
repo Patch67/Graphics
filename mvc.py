@@ -110,11 +110,17 @@ class Controller():
         # TODO: Add code for Select
         if self.mode == "LINE":
             if not self.view.temp:
-                self.view.temp = TempLine(self.view, x, y)  # Create the temp object
+                xy = self.model.graph.pick(x, y, 20)
+                if xy:
+                    x = xy[0]
+                    y = xy[1]
+                self.view.temp = TempLine(self.view, self, x, y)  # Create the temp object
                 self.x = x
                 self.y = y
             else:
-                self.view.temp.close(x, y)  # Tell view to finish drawing object in progress
+                xy = self.view.temp.close(x, y)  # Tell view to finish drawing object in progress
+                x = xy[0]
+                y = xy[1]
                 self.view.temp = None  # Kill the temp object
                 self.model.add_line(self.x, self.y, x, y)
                 self.x = x

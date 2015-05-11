@@ -26,6 +26,9 @@ class Graph:
     def to_gcode(self, file):
         pass
 
+    @abc.abstractmethod
+    def pick(self, x, y, d):
+        pass
     # TODO: Add other export options such as SVG, DXF, PDF, etc.
 
 
@@ -46,6 +49,34 @@ class Line(Graph):
         file.write("G0 X%d Yd%\n" % (self.x0, self.y0))  # Move
         file.write("G1 X%d Yd%\n" % (self.x1, self.y1))  # End
 
+    def pick(self, x, y, d):
+        """If start point, end point or mid point is within d units return
+        their coordinates.
+        if not return None, i.e. no match"""
+        d = d*d  # d is distance squared
+        # Do Start point
+        dx = self.x0 - x
+        dy = self.y0 - y
+        d2 = dx*dx + dy*dy  # d2 is distance squared avoiding use of sqrt
+        if d2 < d:  # if distance <5. Note use of 25 which is 5 squared
+            return [self.x0, self.y0]  # return coordinates of start point
+        # Do end point
+        dx = self.x1 - x
+        dy = self.y1 - y
+        d2 = dx*dx + dy*dy
+        if d2 < d:
+            return [self.x1, self.y1]  # return coordinates of end point
+        # Do middle point
+        mx = int(self.x0 + (self.x1 - self.x0) / 2)  # middle x
+        my = int(self.y0 + (self.y1 - self.y0) / 2)  # middle y
+        dx = mx - x
+        dy = my - y
+        d2 = dx*dx + dy*dy
+        if d2 < d:
+            return [mx, my]  # return coordinates of middle point
+
+        return None  # No matches found
+
 
 class Circle(Graph):
     """ Concrete class for graphics circles
@@ -61,6 +92,10 @@ class Circle(Graph):
 
     def to_gcode(self, file):
         file.write("(Circle %d, %d radius %d" % (self.x, self.y, self.r))
+
+    def pick(self, x, y, d):
+        # TODO: Add code for Circle pick
+        return None
 
 
 class Rectangle(Graph):
@@ -83,6 +118,9 @@ class Rectangle(Graph):
         file.write("G1 X%d Yd%\n" % (self.x0, self.y1))  # Left
         file.write("G1 X%d Yd%\n" % (self.x0, self.y0))  # Down
 
+    def pick(self, x, y, d):
+        # TODO: Add code for Rectangle pick
+        return None
 
 class Text(Graph):
     """ Concrete class for graphics text
@@ -99,6 +137,10 @@ class Text(Graph):
 
     def to_gcode(self, file):
         file.write("(Text is %s)\n" % self.text)
+
+    def pick(self, x, y, d):
+        # TODO: Add code for Text pick
+        return None
 
 
 class Group(Graph):
@@ -123,3 +165,11 @@ class Group(Graph):
         file.write("( Group: %s )\n" % self.name)
         for child in self.children:
             child.to_gcode(file)
+
+    def pick(self, x, y, d):
+        for child in self.children:
+            r = child.pick(x, y, d)
+            if r:  # if there is a find
+                return r  # return a the coordinates
+        return None  # if no finds then return None
+
