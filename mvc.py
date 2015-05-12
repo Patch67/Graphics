@@ -91,6 +91,11 @@ class Controller():
                 self.cmd_save()
         self.view.exit()  # Exit the application
 
+    def cmd_escape(self):
+        if self.view.temp:
+            self.view.temp.escape()
+            self.view.temp = None
+
     def cmd_dirty(self):
         # TODO: Remove this code
         """Called from context menu"""
@@ -128,7 +133,11 @@ class Controller():
         elif self.mode == "CIRCLE":
             # TODO: Make circle via centre, radius as well as corner, corner
             if not self.view.temp:
-                self.view.temp = TempCircle(self.view, x, y)  # Create the temp object
+                xy = self.model.graph.snap(x, y, 20)
+                if xy:
+                    x = xy[0]
+                    y = xy[1]
+                self.view.temp = TempCircle(self.view, self, x, y)  # Create the temp object
                 self.x = x
                 self.y = y
             else:
@@ -156,7 +165,6 @@ class Controller():
                 if xy:
                     x = xy[0]
                     y = xy[1]
-
                 self.model.add_rectangle(self.x, self.y, x, y)
                 self.x = x
                 self.y = y

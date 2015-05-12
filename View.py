@@ -137,6 +137,7 @@ class View():
         self.canvas.bind("<Button-3>", self.right_click)
         self.canvas.bind("<Configure>", self.on_resize)
         self.canvas.bind("<Motion>", self.on_move)
+        self.canvas.bind("<Escape>", self.key_escape)
         self.master.protocol('WM_DELETE_WINDOW', self.control.cmd_exit) # Window closing event
 
     def on_resize(self, e):
@@ -148,6 +149,8 @@ class View():
         if self.temp:  # if there is a graphics operation in progress
             self.temp.mouse_move(e.x, e.y)  # tell the graphics operation about the mouse move
 
+    def key_escape(self, e):
+        self.control.cmd_escape()
 
     @staticmethod
     def question_box(title, text):
