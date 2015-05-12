@@ -110,7 +110,7 @@ class Controller():
         # TODO: Add code for Select
         if self.mode == "LINE":
             if not self.view.temp:
-                xy = self.model.graph.pick(x, y, 20)
+                xy = self.model.graph.snap(x, y, 20)
                 if xy:
                     x = xy[0]
                     y = xy[1]
@@ -142,12 +142,21 @@ class Controller():
                 self.y = y
         elif self.mode == "RECTANGLE":
             if not self.view.temp:
-                self.view.temp = TempRectangle(self.view, x, y)
+                xy = self.model.graph.snap(x, y, 20)
+                if xy:
+                    x = xy[0]
+                    y = xy[1]
+                self.view.temp = TempRectangle(self.view, self, x, y)
                 self.x = x
                 self.y = y
             else:
                 self.view.temp.close(x, y)  # Tell view to finish drawing object in progress
                 self.view.temp = None  # Kill the temp object
+                xy = self.model.graph.snap(x, y, 20)
+                if xy:
+                    x = xy[0]
+                    y = xy[1]
+
                 self.model.add_rectangle(self.x, self.y, x, y)
                 self.x = x
                 self.y = y
