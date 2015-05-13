@@ -11,12 +11,14 @@ import abc
 
 
 def dist2(x0, y0, x1, y1):
+    """fFinds the distance squared between two points"""
     dx = abs(x1 - x0)
     dy = abs(y1 - y0)
     return dx*dx + dy*dy
 
 
 def mid(x0, y0, x1, y1):
+    """Finds the mid point between two points"""
     mx = int(x0 + (x1 - x0) / 2)  # middle x
     my = int(y0 + (y1 - y0) / 2)  # middle y
     return [mx, my]

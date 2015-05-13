@@ -138,6 +138,7 @@ class View():
         self.canvas.bind("<Configure>", self.on_resize)
         self.canvas.bind("<Motion>", self.on_move)
         self.canvas.bind("<Escape>", self.key_escape)
+        self.canvas.bind("<Key>", self.on_key)
         self.master.protocol('WM_DELETE_WINDOW', self.control.cmd_exit) # Window closing event
 
     def on_resize(self, e):
@@ -151,6 +152,17 @@ class View():
 
     def key_escape(self, e):
         self.control.cmd_escape()
+
+    def on_key(self, e):
+        if e.char == "l":
+            self.control.cmd_line()
+        elif e.char == "r":
+            self.control.cmd_rectangle()
+        elif e.char == "c":
+            self.control.cmd_circle()
+
+
+
 
     @staticmethod
     def question_box(title, text):

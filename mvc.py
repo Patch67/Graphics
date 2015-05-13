@@ -54,6 +54,7 @@ class Controller():
             self.cmd_save()
         self.model = Model(self)
         self.filename = ""
+        # TODO: Add code to clear the view canvas
 
     def cmd_open(self):
         if self.model.dirty:  # App has unsaved data so ask user to save it
@@ -141,7 +142,9 @@ class Controller():
                 self.x = x
                 self.y = y
             else:
-                self.view.temp.close(x, y)  # Tell view to finish drawing object in progress
+                xy = self.view.temp.close(x, y)  # Tell view to finish drawing object in progress
+                x = xy[0]
+                y = xy[1]
                 self.view.temp = None  # Kill the temp object
                 dx = self.x - x
                 dy = self.y - y

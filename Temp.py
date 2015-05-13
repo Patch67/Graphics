@@ -92,6 +92,7 @@ class TempRectangle(Temp):
             x = xy[0]
             y = xy[1]
         self.canvas.create_rectangle(self.x0, self.y0, x, y)
+        return [x, y]
 
 
 class TempCircle(Temp):
@@ -108,10 +109,18 @@ class TempCircle(Temp):
         # erase old line, if it exists else draw new line
         if self.id:
             self.canvas.delete(self.id)
-
+        xy = self.model.graph.snap(x, y, 20)
+        if xy:  # Pick found
+            x = xy[0]
+            y = xy[1]
         self.id = self.canvas.create_oval(self.x0, self.y0, x, y)  # Create new temp line
 
     def close(self, x, y):
         self.canvas.delete(self.id)
         self.id = None
+        xy = self.model.graph.snap(x, y, 20)
+        if xy:  # Pick found
+            x = xy[0]
+            y = xy[1]
         self.canvas.create_oval(self.x0, self.y0, x, y)
+        return [x, y]

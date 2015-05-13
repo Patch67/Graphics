@@ -47,6 +47,7 @@ Patrick
 #  ================================
 #  ignore __pycache__
 __pycache__/
+__pycache__\
 *.py[cod]
 #  ignore pycharms settings
 .idea/
