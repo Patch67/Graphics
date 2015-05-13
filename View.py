@@ -247,8 +247,11 @@ class View():
         self.canvas.create_rectangle(rectangle.x0, rectangle.y0, rectangle.x1, rectangle.y1)
         self.temp = None  # Clear the temp object.
 
+    def clear(self):
+        self.canvas.delete(self.canvas.find_all())
+
     def make_group(self, group):
-        self.canvas.delete(self.canvas.find_all())  # TODO: Sort this out. Do I need to delete them all every time?
+        self.clear_view()  # TODO: Sort this out. Do I need to delete them all every time?
         for child in group.children:
             t = type(child).__name__
             if t == "Line":

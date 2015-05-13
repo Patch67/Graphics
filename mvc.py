@@ -54,12 +54,16 @@ class Controller():
             self.cmd_save()
         self.model = Model(self)
         self.filename = ""
-        # TODO: Add code to clear the view canvas
+        self.view.clear()
 
     def cmd_open(self):
+        """Controls the process of opening a file
+
+
+        """
         if self.model.dirty:  # App has unsaved data so ask user to save it
             if self.view.question_box(self.name, "Do you want to save your work?"):
-                self.cmd_open()
+                self.cmd_save()
         filename = self.view.open_file_dialog()
         if filename != "":  # if user does not press Cancel in response to open file dialog
             self.filename = filename
@@ -193,6 +197,7 @@ class Controller():
         self.mode = "LINE"
 
     def cmd_circle(self):
+        """Sets us up to draw circles"""
         self.mode = "CIRCLE"
         
     def cmd_rectangle(self):
