@@ -1,5 +1,5 @@
 from Graph import Group, Line, Rectangle, Circle
-
+import pickle
 
 class Model():
     """The Model part of MVC.
@@ -57,3 +57,6 @@ class Model():
     def add_instance(self, x, y):
         # TODO: Add code for instance
         pass
+
+    def load(self, file):
+        self.graph = pickle.load(file)

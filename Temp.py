@@ -1,5 +1,5 @@
 import abc
-
+from math import sqrt
 
 class Temp():
     """Abstract base class for all temporary graphics objects.
@@ -82,6 +82,18 @@ class TempRectangle(Temp):
         if xy:  # Pick found
             x = xy[0]
             y = xy[1]
+        width = abs(self.x0 - x)
+        height = abs(self.y0 - y)
+        if abs(width - height) < 10:  # Near square
+            av = (width + height) / 2
+            if self.x0 < x:
+                x = self.x0 + av
+            else:
+                x = self.x0 - av
+            if self.y0 < y:
+                y = self.y0 + av
+            else:
+                y = self.y0 - av
         self.id = self.canvas.create_rectangle(self.x0, self.y0, x, y)  # Create new temp line
 
     def close(self, x, y):

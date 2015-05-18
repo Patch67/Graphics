@@ -8,7 +8,7 @@ Patrick Biggs
 """
 
 import abc
-
+import pickle
 
 def dist2(x0, y0, x1, y1):
     """fFinds the distance squared between two points"""
@@ -113,7 +113,10 @@ class Rectangle(Graph):
         self.y1 = y1
         
     def save(self, file):
-        file.write("RECTANGLE %d, %d, %d, %d\n" % (self.x0, self.y0, self.x1, self.y1))
+        if Group.mode == "Text":
+            file.write("RECTANGLE %d, %d, %d, %d\n" % (self.x0, self.y0, self.x1, self.y1))
+        elif Group.mode == "Pickle":
+            pickle.dump(self, file=file)
 
     def to_gcode(self, file):
         file.write("G0 X%d Yd%\n" % (self.x0, self.y0))  # Move
@@ -176,6 +179,7 @@ class Group(Graph):
     Implements the composite pattern
     Based on the MVC architectural pattern so only for data handling, not actually drawing
     """
+    mode = "Pickle"
 
     def __init__(self,name):
         self.name = name
@@ -185,9 +189,12 @@ class Group(Graph):
         self.children.append(graph)
 
     def save(self, file):
-        file.write("GROUP %s\n" % self.name)
-        for child in self.children:
-            child.save(file)
+        if Group.mode == "Text":
+            file.write("GROUP %s\n" % self.name)
+            for child in self.children:
+                child.save(file)
+        elif Group.mode == "Pickle":
+            pickle.dump(self, file=file)
 
     def to_gcode(self, file):
         file.write("( Group: %s )\n" % self.name)

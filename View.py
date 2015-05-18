@@ -187,7 +187,7 @@ class View():
     @staticmethod
     def save_file_dialog(initial_file):
         """Just a wrapped for tkinter so command calls can be tkinter independent"""
-        return filedialog.asksaveasfile(mode='w',
+        return filedialog.asksaveasfile(mode='wb',
                                         initialfile=initial_file,
                                         filetypes=(("Text", "*.txt"),("Gcode", "*.gcode"),("All files", "*.*")),
                                         defaultextension=".txt")

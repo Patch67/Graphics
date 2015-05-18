@@ -67,7 +67,9 @@ class Controller():
         filename = self.view.open_file_dialog()
         if filename != "":  # if user does not press Cancel in response to open file dialog
             self.filename = filename
-            # TODO: Put open code here
+            file = open(filename, mode="rb")
+            self.model.load(file)
+            file.close()
 
     def cmd_save(self):
         if self.filename != "":  # if app already has a filename simply save else do save as
@@ -85,7 +87,7 @@ class Controller():
         else:
             if file:  # if valid file
                 # self.model.save(filename)
-                TextGroup(self.model.graph, file).show()
+                self.model.graph.save(file)
                 self.filename = file.name
                 file.close()
                 self.model.dirty = False
@@ -97,9 +99,9 @@ class Controller():
         self.view.exit()  # Exit the application
 
     def cmd_escape(self):
-        if self.view.temp:
-            self.view.temp.escape()
-            self.view.temp = None
+        if self.view.temp:  # if we are in the process of creating an object
+            self.view.temp.escape()  # remove any creation artefacts
+            self.view.temp = None  # reset creation object
 
     def cmd_dirty(self):
         # TODO: Remove this code
