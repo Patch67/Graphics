@@ -10,6 +10,7 @@ Patrick Biggs
 import abc
 import pickle
 
+
 def dist2(x0, y0, x1, y1):
     """fFinds the distance squared between two points"""
     dx = abs(x1 - x0)
@@ -27,7 +28,8 @@ def mid(x0, y0, x1, y1):
 class Graph:
     """ Abstract base class from which all graphics object derive"""
     __metaclass__ = abc.ABCMeta
-    
+    mode = "Pickle"
+
     @abc.abstractmethod
     def __init__(self):
         pass
@@ -57,7 +59,10 @@ class Line(Graph):
         self.y1 = y1
 
     def save(self, file):
-        file.write("LINE %d, %d, %d, %d\n" % (self.x0, self.y0, self.x1, self.y1))
+        if self.mode == "Text":
+            file.write("LINE %d, %d, %d, %d\n" % (self.x0, self.y0, self.x1, self.y1))
+        elif self.mode == "Pickle":
+            pickle.dump(self, file)
 
     def to_gcode(self, file):
         file.write("G0 X%d Yd%\n" % (self.x0, self.y0))  # Move
@@ -86,13 +91,17 @@ class Circle(Graph):
     """ Concrete class for graphics circles
     Based on the MVC architectural pattern so only for data handling, not actually drawing
     """
-    def __init__(self, x, y, r):
-        self.x = x
-        self.y = y
-        self.r = r
+    def __init__(self, x0, y0, x1, y1):
+        self.x0 = x0
+        self.y0 = y0
+        self.x1 = x1
+        self.y1 = y1
 
     def save(self, file):
-        file.write("CIRCLE %d, %d, %d\n" % (self.x, self.y, self.r))
+        if self.mode == "Text":
+            file.write("CIRCLE %d, %d, %d, %d\n" % (self.x0, self.y0, self.x1, self.y1))
+        elif self.mode == "Pickle":
+            pickle.dump(self, file)
 
     def to_gcode(self, file):
         file.write("(Circle %d, %d radius %d" % (self.x, self.y, self.r))
@@ -113,9 +122,9 @@ class Rectangle(Graph):
         self.y1 = y1
         
     def save(self, file):
-        if Group.mode == "Text":
+        if self.mode == "Text":
             file.write("RECTANGLE %d, %d, %d, %d\n" % (self.x0, self.y0, self.x1, self.y1))
-        elif Group.mode == "Pickle":
+        elif self.mode == "Pickle":
             pickle.dump(self, file=file)
 
     def to_gcode(self, file):
@@ -164,7 +173,10 @@ class Text(Graph):
         self.text = text
 
     def save(self, file):
-        file.write("TEXT %d, %d, %s\n" % (self.x, self.y, self.text1))
+        if self.mode == "Text":
+            file.write("TEXT %d, %d, %s\n" % (self.x, self.y, self.text1))
+        elif self.mode == "Pickle":
+            pickle.dump(self, file)
 
     def to_gcode(self, file):
         file.write("(Text is %s)\n" % self.text)
@@ -189,11 +201,11 @@ class Group(Graph):
         self.children.append(graph)
 
     def save(self, file):
-        if Group.mode == "Text":
+        if self.mode == "Text":
             file.write("GROUP %s\n" % self.name)
             for child in self.children:
                 child.save(file)
-        elif Group.mode == "Pickle":
+        elif self.mode == "Pickle":
             pickle.dump(self, file=file)
 
     def to_gcode(self, file):

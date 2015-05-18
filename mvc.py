@@ -69,11 +69,12 @@ class Controller():
             self.filename = filename
             file = open(filename, mode="rb")
             self.model.load(file)
+            self.view.make_group(self.model.graph)
             file.close()
 
     def cmd_save(self):
         if self.filename != "":  # if app already has a filename simply save else do save as
-            file = open(self.filename, "w")
+            file = open(self.filename, "wb")
             self.model.graph.save(file)
             file.close()
         else:
@@ -152,10 +153,7 @@ class Controller():
                 x = xy[0]
                 y = xy[1]
                 self.view.temp = None  # Kill the temp object
-                dx = self.x - x
-                dy = self.y - y
-                radius = sqrt(dx*dx + dy*dy)
-                self.model.add_circle(self.x, self.y, radius)
+                self.model.add_circle(self.x, self.y, x, y)
                 self.x = x
                 self.y = y
         elif self.mode == "RECTANGLE":

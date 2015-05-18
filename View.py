@@ -238,8 +238,7 @@ class View():
 
     def make_circle(self, circle):
         """Add a new, permanent, circle to canvas"""
-        print("Drawing a circle %d, %d, %d, %d" % (circle.x, circle.y, circle.x + circle.r, circle.y))
-        self.canvas.create_arc(circle.x, circle.y, circle.x + circle.r, circle.y, style=ARC)
+        self.canvas.create_oval(circle.x0, circle.y0, circle.x1, circle.y1)
         self.temp = None  # Clear the temp object.
 
     def make_rectangle(self, rectangle):
@@ -251,7 +250,7 @@ class View():
         self.canvas.delete(self.canvas.find_all())
 
     def make_group(self, group):
-        self.clear_view()  # TODO: Sort this out. Do I need to delete them all every time?
+        self.clear()
         for child in group.children:
             t = type(child).__name__
             if t == "Line":

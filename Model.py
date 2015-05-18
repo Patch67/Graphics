@@ -31,15 +31,15 @@ class Model():
         self.controller.dirty_changed()  # Notify Controller that value changed
 
     def add_line(self, x0, y0, x1, y1):
-        self.graph.add(Line(x0,y0,x1,y1))
+        self.graph.add(Line(x0, y0, x1, y1))
         self.dirty = True
     
     def add_rectangle(self, x0, y0, x1, y1):
-        self.graph.add(Rectangle(x0,y0,x1,y1))
+        self.graph.add(Rectangle(x0, y0, x1, y1))
         self.dirty = True
 
-    def add_circle(self,x, y, r):
-        self.graph.add(Circle(x, y, r))
+    def add_circle(self, x0, y0, x1, y1):
+        self.graph.add(Circle(x0, y0, x1, y1))
         self.dirty = True
 
     def add_poly_line(self):
