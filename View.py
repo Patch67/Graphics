@@ -182,15 +182,15 @@ class View():
     @staticmethod
     def open_file_dialog():
         """Just a wrapped for tkinter so command calls can be tkinter independent"""
-        return filedialog.askopenfilename(filetypes=(("Gcode","*.gcode"), ("All files","*.*")))
+        return filedialog.askopenfilename(filetypes=(("PyCAD","*.cad"), ("All files","*.*")))
 
     @staticmethod
     def save_file_dialog(initial_file):
         """Just a wrapped for tkinter so command calls can be tkinter independent"""
         return filedialog.asksaveasfile(mode='wb',
                                         initialfile=initial_file,
-                                        filetypes=(("Text", "*.txt"),("Gcode", "*.gcode"),("All files", "*.*")),
-                                        defaultextension=".txt")
+                                        filetypes=(("PyCAD", "*.cad"),("All files", "*.*")),
+                                        defaultextension=".cad")
 
     def key_open(self, e):
         self.control.cmd_open()

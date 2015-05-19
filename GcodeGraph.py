@@ -7,6 +7,7 @@ Patrick Biggs
 
 from Graph import *
 
+
 class GcodeLine(Line):
     def __init__(self,line):
         self.line=line
@@ -15,6 +16,7 @@ class GcodeLine(Line):
     def show(self):
         print("G0 X%d Y%d" % (self.x0,self.y0))
         print("G1 X%d Y%d" % (self.x1, self.x0))
+
 
 class GcodeRectangle(Rectangle):
     def __init__(self,rect):

@@ -75,7 +75,7 @@ class Controller():
     def cmd_save(self):
         if self.filename != "":  # if app already has a filename simply save else do save as
             file = open(self.filename, "wb")
-            self.model.graph.save(file)
+            self.model.save(file)
             file.close()
         else:
             self.cmd_save_as()
@@ -87,8 +87,10 @@ class Controller():
             self.view.warning_box(self.name, "Can't access file %s" % self.filename)
         else:
             if file:  # if valid file
-                # self.model.save(filename)
-                self.model.graph.save(file)
+                try:
+                    self.model.save(file)
+                except:
+                    self.view.warning_box(self.name, "Error saving file %s" % self.filename)
                 self.filename = file.name
                 file.close()
                 self.model.dirty = False

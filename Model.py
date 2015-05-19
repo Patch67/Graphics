@@ -1,6 +1,7 @@
 from Graph import Group, Line, Rectangle, Circle
 import pickle
 
+
 class Model():
     """The Model part of MVC.
 
@@ -59,4 +60,17 @@ class Model():
         pass
 
     def load(self, file):
-        self.graph = pickle.load(file)
+        """Load the entire Graph Structure"""
+        try:
+            self.graph = pickle.load(file)
+            self.dirty = False
+        except EOFError:
+            print("Error could not load %s" % file.name)
+
+    def save(self, file):
+        """Save the entire Graph structure"""
+        try:
+            pickle.dump(self.graph, file=file)
+            self.dirty = False
+        except IOError:
+            print("Error could not save %s" % file.name)

@@ -7,6 +7,7 @@ Patrick Biggs
 
 from Graph import *
 
+
 class TextLine(Line):
     def __init__(self,line):
         self.line=line
@@ -15,6 +16,7 @@ class TextLine(Line):
     def show(self,f):
         f.write("Line (%d, %d) - (%d, %d)\n" % (self.x0, self.y0, self.x1, self.y1))
 
+
 class TextCircle(Circle):
     def __init__(self,circle):
         self.circle=circle
@@ -22,6 +24,7 @@ class TextCircle(Circle):
 
     def show(self,f):
         f.write("Circle (%d, %d) - %d\n" % (self.x, self.y, self.r))
+
 
 class TextRectangle(Rectangle):
     def __init__(self,rectangle):
@@ -32,6 +35,7 @@ class TextRectangle(Rectangle):
     def show(self,f):
         f.write("Rectangle (%d, %d) - (%d, %d)\n" % (self.x0, self.y0, self.x1, self.y1))
 
+
 class TextText(Text):
     def __init__(self,text):
         self.text = text
@@ -39,6 +43,7 @@ class TextText(Text):
 
     def show(self,f):
         f.write("Text (%d, %d) - %s\n" % (self.x, self.y, self.text))
+
 
 class TextGroup(Group):
     def __init__(self,group,f):

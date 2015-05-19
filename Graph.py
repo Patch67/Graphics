@@ -8,11 +8,10 @@ Patrick Biggs
 """
 
 import abc
-import pickle
 
 
 def dist2(x0, y0, x1, y1):
-    """fFinds the distance squared between two points"""
+    """Finds the distance squared between two points"""
     dx = abs(x1 - x0)
     dy = abs(y1 - y0)
     return dx*dx + dy*dy
@@ -28,45 +27,23 @@ def mid(x0, y0, x1, y1):
 class Graph:
     """ Abstract base class from which all graphics object derive"""
     __metaclass__ = abc.ABCMeta
-    mode = "Pickle"
 
     @abc.abstractmethod
     def __init__(self):
         pass
     
     @abc.abstractmethod
-    def save(self, file):
-        pass
-
-    @abc.abstractmethod
-    def to_gcode(self, file):
-        pass
-
-    @abc.abstractmethod
     def snap(self, x, y, d):
         pass
-    # TODO: Add other export options such as SVG, DXF, PDF, etc.
 
 
 class Line(Graph):
-    """ Concrete class for graphics lines
-    Based on the MVC architectural pattern so only for data handling, not actually drawing
-    """
+    """ Concrete class for graphics lines"""
     def __init__(self, x0, y0, x1, y1):
         self.x0 = x0
         self.y0 = y0
         self.x1 = x1
         self.y1 = y1
-
-    def save(self, file):
-        if self.mode == "Text":
-            file.write("LINE %d, %d, %d, %d\n" % (self.x0, self.y0, self.x1, self.y1))
-        elif self.mode == "Pickle":
-            pickle.dump(self, file)
-
-    def to_gcode(self, file):
-        file.write("G0 X%d Yd%\n" % (self.x0, self.y0))  # Move
-        file.write("G1 X%d Yd%\n" % (self.x1, self.y1))  # End
 
     def snap(self, x, y, d):
         """If start point, end point or mid point is within d units return
@@ -88,23 +65,12 @@ class Line(Graph):
 
 
 class Circle(Graph):
-    """ Concrete class for graphics circles
-    Based on the MVC architectural pattern so only for data handling, not actually drawing
-    """
+    """ Concrete class for graphics circles"""
     def __init__(self, x0, y0, x1, y1):
         self.x0 = x0
         self.y0 = y0
         self.x1 = x1
         self.y1 = y1
-
-    def save(self, file):
-        if self.mode == "Text":
-            file.write("CIRCLE %d, %d, %d, %d\n" % (self.x0, self.y0, self.x1, self.y1))
-        elif self.mode == "Pickle":
-            pickle.dump(self, file)
-
-    def to_gcode(self, file):
-        file.write("(Circle %d, %d radius %d" % (self.x, self.y, self.r))
 
     def snap(self, x, y, d):
         # TODO: Add code for Circle pick
@@ -112,27 +78,12 @@ class Circle(Graph):
 
 
 class Rectangle(Graph):
-    """ Concrete class for graphics rectangles
-    Based on the MVC architectural pattern so only for data handling, not actually drawing
-    """
+    """ Concrete class for rectangles"""
     def __init__(self, x0, y0, x1, y1):
         self.x0 = x0
         self.y0 = y0
         self.x1 = x1
         self.y1 = y1
-        
-    def save(self, file):
-        if self.mode == "Text":
-            file.write("RECTANGLE %d, %d, %d, %d\n" % (self.x0, self.y0, self.x1, self.y1))
-        elif self.mode == "Pickle":
-            pickle.dump(self, file=file)
-
-    def to_gcode(self, file):
-        file.write("G0 X%d Yd%\n" % (self.x0, self.y0))  # Move
-        file.write("G1 X%d Yd%\n" % (self.x1, self.y0))  # Right
-        file.write("G1 X%d Yd%\n" % (self.x1, self.y1))  # Up
-        file.write("G1 X%d Yd%\n" % (self.x0, self.y1))  # Left
-        file.write("G1 X%d Yd%\n" % (self.x0, self.y0))  # Down
 
     def snap(self, x, y, d):
         d2 = d*d  # Squares are quicker than sqrt
@@ -172,15 +123,6 @@ class Text(Graph):
         self.y = y
         self.text = text
 
-    def save(self, file):
-        if self.mode == "Text":
-            file.write("TEXT %d, %d, %s\n" % (self.x, self.y, self.text1))
-        elif self.mode == "Pickle":
-            pickle.dump(self, file)
-
-    def to_gcode(self, file):
-        file.write("(Text is %s)\n" % self.text)
-
     def snap(self, x, y, d):
         # TODO: Add code for Text pick
         return None
@@ -191,7 +133,6 @@ class Group(Graph):
     Implements the composite pattern
     Based on the MVC architectural pattern so only for data handling, not actually drawing
     """
-    mode = "Pickle"
 
     def __init__(self,name):
         self.name = name
@@ -199,19 +140,6 @@ class Group(Graph):
 
     def add(self,graph):
         self.children.append(graph)
-
-    def save(self, file):
-        if self.mode == "Text":
-            file.write("GROUP %s\n" % self.name)
-            for child in self.children:
-                child.save(file)
-        elif self.mode == "Pickle":
-            pickle.dump(self, file=file)
-
-    def to_gcode(self, file):
-        file.write("( Group: %s )\n" % self.name)
-        for child in self.children:
-            child.to_gcode(file)
 
     def snap(self, x, y, d):
         for child in self.children:

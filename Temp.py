@@ -1,6 +1,7 @@
 import abc
 from math import sqrt
 
+
 class Temp():
     """Abstract base class for all temporary graphics objects.
 
@@ -84,7 +85,7 @@ class TempRectangle(Temp):
             y = xy[1]
         width = abs(self.x0 - x)
         height = abs(self.y0 - y)
-        if abs(width - height) < 10:  # Near square
+        if abs(width - height) < 20:  # Near square
             av = (width + height) / 2
             if self.x0 < x:
                 x = self.x0 + av
