@@ -9,19 +9,26 @@ Patrick Biggs
 
 import abc
 
+class Vector2():
+    def __init__(self, x,y):
+        self.x, self.y = x, y;
 
-def dist2(x0, y0, x1, y1):
-    """Finds the distance squared between two points"""
-    dx = abs(x1 - x0)
-    dy = abs(y1 - y0)
-    return dx*dx + dy*dy
+class Vector2Pair():
+    def __init__(self, v0, v1):
+        self.v0, self.v1 = v0, v1
 
+    def dist2(self):
+        """Finds the distance squared between two points.
+        It is faster to comapre squared numbers than to computer square root"""
+        dx = abs(self.v1.x - self.v0.x)
+        dy = abs(self.v1.y - self.v0.y)
+        return dx*dx + dy*dy
 
-def mid(x0, y0, x1, y1):
-    """Finds the mid point between two points"""
-    mx = int(x0 + (x1 - x0) / 2)  # middle x
-    my = int(y0 + (y1 - y0) / 2)  # middle y
-    return [mx, my]
+    def mid(self):
+        """Finds the mid point between two points"""
+        mx = int(self.v0.x + (self.v1.x - (self.v0.x) / 2)  # middle x
+        my = int(self.v0.y + (self.v1.y - self.v0.y) / 2)  # middle y
+        return Vector2(mx, my)
 
 
 class Graph:
@@ -33,33 +40,34 @@ class Graph:
         pass
     
     @abc.abstractmethod
-    def snap(self, x, y, d):
+    def snap(self, v, d):
+        """Search for coordinates within d - distance or v - Vector, i.e. Mouse click"""
         pass
 
 
 class Line(Graph):
     """ Concrete class for graphics lines"""
     def __init__(self, x0, y0, x1, y1):
-        self.x0 = x0
-        self.y0 = y0
-        self.x1 = x1
-        self.y1 = y1
+        self.v0 = Vector2(x0,y0)
+        self.v1 = Vector2(x1,y1)
 
-    def snap(self, x, y, d):
+    def snap(self, v, d):
         """If start point, end point or mid point is within d units return
         their coordinates.
         if not return None, i.e. no match"""
-        d = d*d  # d is distance squared
+
+        d *= d  # d is distance squared
+
         '''Check the two end points'''
-        if dist2(self.x0, self.y0, x, y) < d:  # if distance <5. Note use of 25 which is 5 squared
-            return [self.x0, self.y0]  # return coordinates of start point
-        if dist2(self.x1, self.y1, x, y) < d:
-            return [self.x1, self.y1]  # return coordinates of end point
+        if Vector2Pair(self.v0, v).dis2() < d:  # if distance <5. Note use of 25 which is 5 squared
+            return ["End", self.v0]  # return coordinates of start point
+        if Vector2Pair(self.v1, v).dis2() < d:
+            return ["End", self.v1]  # return coordinates of end point
 
         '''Check the middle point'''
-        mxy = mid(self.x0, self.y0, self.x1, self.y1)
-        if dist2(mxy[0], mxy[1], x, y) < d:
-            return mxy  # return coordinates of middle point
+        mid = Vector2Pair(self.v0, self.v1).mid()
+        if Vector2Pair(mid, v) < d:
+            return ["Mid", mid]  # return coordinates of middle point
 
         return None  # No matches found
 
@@ -72,7 +80,7 @@ class Circle(Graph):
         self.x1 = x1
         self.y1 = y1
 
-    def snap(self, x, y, d):
+    def snap(self, v, d):
         # TODO: Add code for Circle pick
         return None
 
@@ -80,36 +88,37 @@ class Circle(Graph):
 class Rectangle(Graph):
     """ Concrete class for rectangles"""
     def __init__(self, x0, y0, x1, y1):
-        self.x0 = x0
-        self.y0 = y0
-        self.x1 = x1
-        self.y1 = y1
+        self.v0 = Vector2(x0, y0)
+        self.v1 = Vector2(x1, y1)
 
-    def snap(self, x, y, d):
+    def snap(self, v, d):
         d2 = d*d  # Squares are quicker than sqrt
         '''Check the four corners'''
-        if dist2(self.x0, self.y0, x, y) < d2:
-            return [self.x0, self.y0]
-        if dist2(self.x1, self.y0, x, y) < d2:
-            return [self.x1, self.y0]
-        if dist2(self.x1, self.y1, x, y) < d2:
-            return [self.x1, self.y1]
-        if dist2(self.x0, self.y1, x, y) < d2:
-            return [self.x0, self.y1]
+        if Vector2Pair(self.v0, v).dist2() < d2:
+            return ["End", self.v0]
+        va = Vector2(self.v1.x, self.v0.y)
+        if Vector2Pair(va, v).dist2 < d2:
+            return ["End", va]
+        if Vector2Pair(self.v1, v).dist2 < d2:
+            return ["End", self.v]
+        vb = Vector2(self.x0, self.y1)
+        if Vector2Pair(vb, v).dist2 < d2:
+            return ["End", vb]
 
         '''Check the four mid points'''
-        mxy = mid(self.x0, self.y0, self.x1, self.y0)
-        if dist2(mxy[0], mxy[1], x, y) < d2:
-            return mxy  # return coordinates of middle point
-        mxy = mid(self.x1, self.y0, self.x1, self.y1)
-        if dist2(mxy[0], mxy[1], x, y) < d2:
-            return mxy  # return coordinates of middle point
-        mxy = mid(self.x1, self.y1, self.x0, self.y1)
-        if dist2(mxy[0], mxy[1], x, y) < d2:
-            return mxy  # return coordinates of middle point
-        mxy = mid(self.x0, self.y1, self.x0, self.y0)
-        if dist2(mxy[0], mxy[1], x, y) < d2:
-            return mxy  # return coordinates of middle point
+        mid = Vector2Pair(self.v0, va).mid()
+        if Vector2Pair(mid, v).dist2() < d2:
+            return ["Mid", mid]  # return coordinates of middle point
+        mid = Vector2Pair(va, self.v1).mid()
+        if Vector2Pair(mid, v).dist2() < d2:
+            return ["Mid", mid]  # return coordinates of middle point
+        mid = Vector2Pair(self.v1, vb).mid()
+        if Vector2Pair(mid, v).dist2() < d2:
+            return ["Mid", mid]  # return coordinates of middle point
+        mid = Vector2Pair(vb, self.v0).mid()
+        if Vector2Pair(mid, v).dist2() < d2:
+            return ["Mid", mid]  # return coordinates of middle point
+
         return None
 
 
@@ -123,7 +132,7 @@ class Text(Graph):
         self.y = y
         self.text = text
 
-    def snap(self, x, y, d):
+    def snap(self, v, d):
         # TODO: Add code for Text pick
         return None
 
@@ -141,9 +150,9 @@ class Group(Graph):
     def add(self,graph):
         self.children.append(graph)
 
-    def snap(self, x, y, d):
+    def snap(self, v, d):
         for child in self.children:
-            r = child.snap(x, y, d)
+            r = child.snap(v, d)
             if r:  # if there is a find
                 return r  # return a the coordinates
         return None  # if no finds then return None

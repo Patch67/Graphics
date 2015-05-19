@@ -54,3 +54,7 @@ __pycache__\
 #  ignore sas data files as these are just working files not really needed
 sas
 sas*.*
+*.pyc
+*.pyc
+*.pyc
+__pycache__/Graph.cpython-34.pyc
