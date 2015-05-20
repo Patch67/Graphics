@@ -13,6 +13,7 @@ class Vector2():
     def __init__(self, x,y):
         self.x, self.y = x, y;
 
+
 class Vector2Pair():
     def __init__(self, v0, v1):
         self.v0, self.v1 = v0, v1
@@ -26,7 +27,7 @@ class Vector2Pair():
 
     def mid(self):
         """Finds the mid point between two points"""
-        mx = int(self.v0.x + (self.v1.x - (self.v0.x) / 2)  # middle x
+        mx = int(self.v0.x + (self.v1.x - self.v0.x) / 2)  # middle x
         my = int(self.v0.y + (self.v1.y - self.v0.y) / 2)  # middle y
         return Vector2(mx, my)
 
@@ -59,14 +60,14 @@ class Line(Graph):
         d *= d  # d is distance squared
 
         '''Check the two end points'''
-        if Vector2Pair(self.v0, v).dis2() < d:  # if distance <5. Note use of 25 which is 5 squared
+        if Vector2Pair(self.v0, v).dist2() < d:  # if distance <5. Note use of 25 which is 5 squared
             return ["End", self.v0]  # return coordinates of start point
-        if Vector2Pair(self.v1, v).dis2() < d:
+        if Vector2Pair(self.v1, v).dist2() < d:
             return ["End", self.v1]  # return coordinates of end point
 
         '''Check the middle point'''
         mid = Vector2Pair(self.v0, self.v1).mid()
-        if Vector2Pair(mid, v) < d:
+        if Vector2Pair(mid, v).dist2() < d:
             return ["Mid", mid]  # return coordinates of middle point
 
         return None  # No matches found

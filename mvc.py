@@ -5,6 +5,7 @@ from View import *
 from TextGraph import TextGroup
 from math import sqrt
 from Temp import TempLine, TempCircle, TempRectangle
+from Graph import Vector2
 
 
 class Controller():
@@ -125,7 +126,7 @@ class Controller():
         # TODO: Add code for Select
         if self.mode == "LINE":
             if not self.view.temp:
-                xy = self.model.graph.snap(x, y, 20)
+                xy = self.model.graph.snap(Vector2(x,y), 20)
                 if xy:
                     x = xy[0]
                     y = xy[1]
@@ -143,7 +144,7 @@ class Controller():
         elif self.mode == "CIRCLE":
             # TODO: Make circle via centre, radius as well as corner, corner
             if not self.view.temp:
-                xy = self.model.graph.snap(x, y, 20)
+                xy = self.model.graph.snap(Vector2(x, y), 20)
                 if xy:
                     x = xy[0]
                     y = xy[1]
@@ -160,7 +161,7 @@ class Controller():
                 self.y = y
         elif self.mode == "RECTANGLE":
             if not self.view.temp:
-                xy = self.model.graph.snap(x, y, 20)
+                xy = self.model.graph.snap(Vector2(x, y), 20)
                 if xy:
                     x = xy[0]
                     y = xy[1]

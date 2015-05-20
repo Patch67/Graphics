@@ -1,5 +1,6 @@
 import abc
 from math import sqrt
+from Graph import Vector2
 
 
 class Temp():
@@ -40,10 +41,12 @@ class TempLine(Temp):
         # erase old line, if it exists else draw new line
         if self.id:
             self.canvas.delete(self.id)
-        xy = self.model.graph.snap(x, y, 20)
-        if xy:  # Pick found
-            x = xy[0]
-            y = xy[1]
+        result = self.model.graph.snap(Vector2(x, y), 20)
+        if result:  # Pick found
+            print(result)
+
+            x = result[1].x
+            y = result[1].y
         elif abs(self.x0 - x) < 10:  # Near horizontal
             x = self.x0
         elif abs(self.y0 - y) < 10:  # Near vertical
@@ -53,7 +56,7 @@ class TempLine(Temp):
     def close(self, x, y):
         self.canvas.delete(self.id)
         self.id = None
-        xy = self.model.graph.snap(x, y, 20)
+        xy = self.model.graph.snap(Vector2(x, y), 20)
         if xy:  # Pick found
             x = xy[0]
             y = xy[1]
