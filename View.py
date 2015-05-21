@@ -13,6 +13,7 @@ class View():
         self.canvas = Canvas(self.master)  # Changed frame to Canvas so I can draw graphics on it.
 
         self.tool_bar = None  # Holder for tool bar to come later
+        self.marker_list = []  # List of marker objects as the result of a snap find
         self.temp = None  # This is for a Temp object when drawing a graphics object is under construction
         self.context = None
 
@@ -27,6 +28,7 @@ class View():
 
     def run(self):
         """Start the application (tkinter)"""
+
         self.master.mainloop()
 
     def exit(self):
@@ -149,6 +151,7 @@ class View():
         """Called when mouse moves"""
         if self.temp:  # if there is a graphics operation in progress
             self.temp.mouse_move(e.x, e.y)  # tell the graphics operation about the mouse move
+        self.control.mouse_move(e.x, e.y)
 
     def key_escape(self, e):
         self.control.cmd_escape()
@@ -230,6 +233,10 @@ class View():
         """
         self.temp = None
         pass  # Do nothing
+
+    def erase_markers(self):
+        for marker_id in self.marker_list:
+            self.canvas.delete(marker_id)
 
     def make_line(self, line):
         """Add a new, permanent, line to canvas"""

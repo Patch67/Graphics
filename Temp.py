@@ -1,5 +1,4 @@
 import abc
-from math import sqrt
 from Graph import Vector2
 
 

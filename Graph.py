@@ -171,8 +171,8 @@ class Group(Graph):
 
     def snap(self, v, d):
         for child in self.children:
-            r = child.snap(v, d)
-            if r:  # if there is a find
-                return r  # return a the coordinates
+            marker = child.snap(v, d)
+            if marker:  # if there is a find
+                return marker  # return a the coordinates
         return None  # if no finds then return None
 

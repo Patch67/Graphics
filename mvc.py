@@ -2,8 +2,7 @@
 
 from Model import *
 from View import *
-from TextGraph import TextGroup
-from math import sqrt
+from Marker import EndPointMarker, MidPointMarker
 from Temp import TempLine, TempCircle, TempRectangle
 from Graph import Vector2
 
@@ -107,6 +106,18 @@ class Controller():
             self.view.temp.escape()  # remove any creation artefacts
             self.view.temp = None  # reset creation object
 
+    def mouse_move(self, x, y):
+        self.view.erase_markers()
+        hit = self.model.graph.snap(Vector2(x,y), 20)
+        if hit:
+            x = hit[1].x
+            y = hit[1].y
+            if hit[0] == "End":
+                self.view.marker_list.append(EndPointMarker(self.view, hit[1]))
+            elif hit[0] == "Mid":
+                self.view.marker_list.append(MidPointMarker(self.view, hit[1]))
+
+
     def cmd_left_click(self, x, y):
         # TODO: Investigate snap controls; Snap_to end_point, mid_point, in_line_with, grid
         """Called when user clicks left mouse button
@@ -116,10 +127,14 @@ class Controller():
         # TODO: Add code for Select
         if self.mode == "LINE":
             if not self.view.temp:
-                result = self.model.graph.snap(Vector2(x,y), 20)
-                if result:
-                    x = result[1].x
-                    y = result[1].y
+                hit = self.model.graph.snap(Vector2(x,y), 20)
+                if hit:
+                    x = hit[1].x
+                    y = hit[1].y
+                    if hit[0] == "End":
+                        self.view.marker_list.append(EndPointMarker(self.view, hit[1]))
+                    elif hit[0] == "Mid":
+                        self.view.marker_list.append(MidPointMarker(self.view, hit[1]))
                 self.view.temp = TempLine(self.view, self, x, y)  # Create the temp object
                 self.x = x
                 self.y = y
@@ -127,6 +142,7 @@ class Controller():
                 result = self.view.temp.close(x, y)  # Tell view to finish drawing object in progress
                 x = result[0]
                 y = result[1]
+                self.view.erase_markers()
                 self.view.temp = None  # Kill the temp object
                 self.model.add_line(self.x, self.y, x, y)
                 self.x = x
