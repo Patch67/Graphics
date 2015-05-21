@@ -3,7 +3,7 @@ from math import sqrt
 from Graph import Vector2
 
 
-class Temp():
+class Temp:
     """Abstract base class for all temporary graphics objects.
 
     This means anything that is in the process of construction prior to being written to the canvas permanently.

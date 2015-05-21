@@ -107,16 +107,6 @@ class Controller():
             self.view.temp.escape()  # remove any creation artefacts
             self.view.temp = None  # reset creation object
 
-    def cmd_dirty(self):
-        # TODO: Remove this code
-        """Called from context menu"""
-        self.model.dirty = True
-
-    def cmd_clean(self):
-        # TODO: Remove this code
-        """Called from context menu"""
-        self.model.dirty = False
-
     def cmd_left_click(self, x, y):
         # TODO: Investigate snap controls; Snap_to end_point, mid_point, in_line_with, grid
         """Called when user clicks left mouse button

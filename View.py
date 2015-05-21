@@ -103,8 +103,8 @@ class View():
         """Creates the connects menus, i.e. for right click"""
         self.context = Menu(self.master, tearoff=0)
         # TODO: Add more options such as cut, copy, paste, rotate, scale, etc.
-        self.context.add_command(label="Dirty", command=self.control.cmd_dirty)
-        self.context.add_command(label="Clean", command=self.control.cmd_clean)
+        self.context.add_command(label="Dirty", command=self.control.cmd_null)
+        self.context.add_command(label="Clean", command=self.control.cmd_null)
 
     def create_toolbar(self):
         """Creates toolbar"""
