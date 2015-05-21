@@ -233,17 +233,17 @@ class View():
 
     def make_line(self, line):
         """Add a new, permanent, line to canvas"""
-        self.canvas.create_line(line.x0, line.y0, line.x1, line.y1, fill="#476042")
+        self.canvas.create_line(line.v0.x, line.v0.y, line.v1.x, line.v1.y, fill="#476042")
         self.temp = None  # Clear the temp object.
 
     def make_circle(self, circle):
         """Add a new, permanent, circle to canvas"""
-        self.canvas.create_oval(circle.x0, circle.y0, circle.x1, circle.y1)
+        self.canvas.create_oval(circle.v0.x, circle.v0.y, circle.v1.x, circle.v1.y)
         self.temp = None  # Clear the temp object.
 
     def make_rectangle(self, rectangle):
         """Add a new, permanent, rectangle to canvas"""
-        self.canvas.create_rectangle(rectangle.x0, rectangle.y0, rectangle.x1, rectangle.y1)
+        self.canvas.create_rectangle(rectangle.v0.x, rectangle.v0.y, rectangle.v1.x, rectangle.v1.y)
         self.temp = None  # Clear the temp object.
 
     def clear(self):

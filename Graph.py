@@ -76,10 +76,8 @@ class Line(Graph):
 class Circle(Graph):
     """ Concrete class for graphics circles"""
     def __init__(self, x0, y0, x1, y1):
-        self.x0 = x0
-        self.y0 = y0
-        self.x1 = x1
-        self.y1 = y1
+        self.v0 = Vector2(x0, y0)
+        self.v1 = Vector2(x1, y1)
 
     def snap(self, v, d):
         # TODO: Add code for Circle pick
@@ -98,12 +96,12 @@ class Rectangle(Graph):
         if Vector2Pair(self.v0, v).dist2() < d2:
             return ["End", self.v0]
         va = Vector2(self.v1.x, self.v0.y)
-        if Vector2Pair(va, v).dist2 < d2:
+        if Vector2Pair(va, v).dist2() < d2:
             return ["End", va]
-        if Vector2Pair(self.v1, v).dist2 < d2:
-            return ["End", self.v]
-        vb = Vector2(self.x0, self.y1)
-        if Vector2Pair(vb, v).dist2 < d2:
+        if Vector2Pair(self.v1, v).dist2() < d2:
+            return ["End", self.v1]
+        vb = Vector2(self.v0.x, self.v1.y)
+        if Vector2Pair(vb, v).dist2() < d2:
             return ["End", vb]
 
         '''Check the four mid points'''

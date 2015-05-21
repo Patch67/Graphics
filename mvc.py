@@ -126,17 +126,17 @@ class Controller():
         # TODO: Add code for Select
         if self.mode == "LINE":
             if not self.view.temp:
-                xy = self.model.graph.snap(Vector2(x,y), 20)
-                if xy:
-                    x = xy[0]
-                    y = xy[1]
+                result = self.model.graph.snap(Vector2(x,y), 20)
+                if result:
+                    x = result[1].x
+                    y = result[1].y
                 self.view.temp = TempLine(self.view, self, x, y)  # Create the temp object
                 self.x = x
                 self.y = y
             else:
-                xy = self.view.temp.close(x, y)  # Tell view to finish drawing object in progress
-                x = xy[0]
-                y = xy[1]
+                result = self.view.temp.close(x, y)  # Tell view to finish drawing object in progress
+                x = result[0]
+                y = result[1]
                 self.view.temp = None  # Kill the temp object
                 self.model.add_line(self.x, self.y, x, y)
                 self.x = x
@@ -144,37 +144,37 @@ class Controller():
         elif self.mode == "CIRCLE":
             # TODO: Make circle via centre, radius as well as corner, corner
             if not self.view.temp:
-                xy = self.model.graph.snap(Vector2(x, y), 20)
-                if xy:
-                    x = xy[0]
-                    y = xy[1]
+                result = self.model.graph.snap(Vector2(x, y), 20)
+                if result:
+                    x = result[1].x
+                    y = result[1].y
                 self.view.temp = TempCircle(self.view, self, x, y)  # Create the temp object
                 self.x = x
                 self.y = y
             else:
-                xy = self.view.temp.close(x, y)  # Tell view to finish drawing object in progress
-                x = xy[0]
-                y = xy[1]
+                result = self.view.temp.close(x, y)  # Tell view to finish drawing object in progress
+                x = result[0]
+                y = result[1]
                 self.view.temp = None  # Kill the temp object
                 self.model.add_circle(self.x, self.y, x, y)
                 self.x = x
                 self.y = y
         elif self.mode == "RECTANGLE":
             if not self.view.temp:
-                xy = self.model.graph.snap(Vector2(x, y), 20)
-                if xy:
-                    x = xy[0]
-                    y = xy[1]
+                result = self.model.graph.snap(Vector2(x, y), 20)
+                if result:
+                    x = result[1].x
+                    y = result[1].y
                 self.view.temp = TempRectangle(self.view, self, x, y)
                 self.x = x
                 self.y = y
             else:
                 self.view.temp.close(x, y)  # Tell view to finish drawing object in progress
                 self.view.temp = None  # Kill the temp object
-                xy = self.model.graph.snap(x, y, 20)
-                if xy:
-                    x = xy[0]
-                    y = xy[1]
+                result = self.model.graph.snap(Vector2(x, y), 20)
+                if result:
+                    x = result[1].x
+                    y = result[1].y
                 self.model.add_rectangle(self.x, self.y, x, y)
                 self.x = x
                 self.y = y

@@ -42,9 +42,7 @@ class TempLine(Temp):
         if self.id:
             self.canvas.delete(self.id)
         result = self.model.graph.snap(Vector2(x, y), 20)
-        if result:  # Pick found
-            print(result)
-
+        if result:  # Snap found
             x = result[1].x
             y = result[1].y
         elif abs(self.x0 - x) < 10:  # Near horizontal
@@ -56,10 +54,10 @@ class TempLine(Temp):
     def close(self, x, y):
         self.canvas.delete(self.id)
         self.id = None
-        xy = self.model.graph.snap(Vector2(x, y), 20)
-        if xy:  # Pick found
-            x = xy[0]
-            y = xy[1]
+        result = self.model.graph.snap(Vector2(x, y), 20)
+        if result:  # Pick found
+            x = result[1].x
+            y = result[1].y
         elif abs(self.x0 - x) < 10:  # Near horizontal
             x = self.x0
         elif abs(self.y0 - y) < 10:  # Near vertical
@@ -82,10 +80,10 @@ class TempRectangle(Temp):
         # erase old line, if it exists else draw new line
         if self.id:
             self.canvas.delete(self.id)
-        xy = self.model.graph.snap(x, y, 20)
-        if xy:  # Pick found
-            x = xy[0]
-            y = xy[1]
+        result = self.model.graph.snap(Vector2(x, y), 20)
+        if result:  # Pick found
+            x = result[1].x
+            y = result[1].y
         width = abs(self.x0 - x)
         height = abs(self.y0 - y)
         if abs(width - height) < 20:  # Near square
@@ -103,10 +101,10 @@ class TempRectangle(Temp):
     def close(self, x, y):
         self.canvas.delete(self.id)
         self.id = None
-        xy = self.model.graph.snap(x, y, 20)
-        if xy:  # Pick found
-            x = xy[0]
-            y = xy[1]
+        result = self.model.graph.snap(Vector2(x, y), 20)
+        if result:  # Pick found
+            x = result[1].x
+            y = result[1].y
         self.canvas.create_rectangle(self.x0, self.y0, x, y)
         return [x, y]
 
@@ -125,18 +123,18 @@ class TempCircle(Temp):
         # erase old line, if it exists else draw new line
         if self.id:
             self.canvas.delete(self.id)
-        xy = self.model.graph.snap(x, y, 20)
-        if xy:  # Pick found
-            x = xy[0]
-            y = xy[1]
+        result = self.model.graph.snap(Vector2(x, y), 20)
+        if result:  # Pick found
+            x = result[1].x
+            y = result[1].y
         self.id = self.canvas.create_oval(self.x0, self.y0, x, y)  # Create new temp line
 
     def close(self, x, y):
         self.canvas.delete(self.id)
         self.id = None
-        xy = self.model.graph.snap(x, y, 20)
-        if xy:  # Pick found
-            x = xy[0]
-            y = xy[1]
+        result = self.model.graph.snap(Vector2(x, y), 20)
+        if result:  # Pick found
+            x = result[1].x
+            y = result[1].y
         self.canvas.create_oval(self.x0, self.y0, x, y)
         return [x, y]
