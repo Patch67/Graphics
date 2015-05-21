@@ -1,3 +1,4 @@
+"""Temp classes display graphics objects as they are being constructed"""
 import abc
 from Graph import Vector2
 
@@ -16,13 +17,16 @@ class Temp:
 
     @abc.abstractmethod
     def mouse_move(self, x, y):
+        """Shows the grpahics object as it is being created, i.e. as the mouse moves around"""
         pass
 
     @abc.abstractmethod
     def close(self):
+        """Kills the temporary construction and creates the finished article"""
         pass
 
     def escape(self):
+        """Abandons the construction of a graphics object"""
         self.canvas.delete(self.id)
 
 
@@ -51,6 +55,7 @@ class TempLine(Temp):
         self.id = self.canvas.create_line(self.x0, self.y0, x, y)  # Create new temp line
 
     def close(self, x, y):
+        """Kill the temporary construction line and create the finished item"""
         self.canvas.delete(self.id)
         self.id = None
         result = self.model.graph.snap(Vector2(x, y), 20)
