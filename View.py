@@ -261,7 +261,7 @@ class View():
         self.temp = None  # Clear the temp object.
 
     def clear(self):
-        self.canvas.delete(self.canvas.find_all())
+        self.canvas.delete("all")
 
     def make_group(self, group):
         self.clear()

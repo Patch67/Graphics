@@ -2,7 +2,7 @@
 
 from Model import *
 from View import *
-from Marker import EndPointMarker, MidPointMarker, SquareMarker
+from Marker import EndPointMarker, MidPointMarker, SquareMarker, CentreMarker
 from Vectors import Vector2
 
 
@@ -115,6 +115,8 @@ class Controller():
                 self.view.marker_list.append(EndPointMarker(self.view, hit[1]))
             elif hit[0] == "Mid":
                 self.view.marker_list.append(MidPointMarker(self.view, hit[1]))
+            elif hit[0] == "Centre":
+                self.view.marker_list.append(CentreMarker(self.view, hit[1]))
         '''Process Construction lines'''
         if self.view.temp:  # if there is a graphics operation in progress
             '''See if the mouse snaps more'''

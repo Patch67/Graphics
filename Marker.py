@@ -31,6 +31,12 @@ class MidPointMarker(Marker):
         self.view.marker_list.append(self.view.canvas.create_line(self.v0.x + 5, self.v0.y - 5, self.v0.x - 5, self.v0.y + 5, fill=self.colour))
 
 
+class CentreMarker(Marker):
+    def __init__(self, view, v0):
+        super(CentreMarker, self).__init__(view, v0)
+        self.view.marker_list.append(self.view.canvas.create_oval(self.v0.x - 5, self.v0.y - 5, self.v0.x + 5, self.v0.y + 5, outline=self.colour))
+
+
 class SquareMarker(Marker):
     """Marks a mid point with a little red cross"""
     def __init__(self, view, v0, v1):

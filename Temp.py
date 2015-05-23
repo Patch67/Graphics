@@ -120,3 +120,25 @@ class TempCircle(Temp):
         self.canvas.delete(self.id)
         self.id = None
         self.canvas.create_oval(self.v0.x, self.v0.y, v.x, v.y)
+
+    def snap_more(self, v):
+        """Overrides Temp.snap_more
+        :param v: v is an referenced object which may well have it's contents altered.
+        """
+        '''Check if nearly square'''
+        width = abs(self.v0.x - v.x)
+        height = abs(self.v0.y - v.y)
+        if abs(width - height) < 10:
+            ave = (width + height) / 2
+            self.v1 = v  # Just to initiate a Vector2 variable
+            if self.v0.x < v.x:
+                self.v1.x = self.v0.x + ave
+            else:
+                self.v1.x = self.v0.x - ave
+            if self.v0.y < v.y:
+                self.v1.y = self.v0.y + ave
+            else:
+                self.v1.y = self.v0.y - ave
+            return ["Sqr",self.v0, self.v1]
+        else:
+            return ["None", v]

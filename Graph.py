@@ -58,9 +58,12 @@ class Circle(Graph):
         self.v1 = Vector2(x1, y1)
 
     def snap(self, v, d):
-        # TODO: Add code for Circle pick
-        return None
-
+        centre = Vector2Pair(self.v0, self.v1).mid()
+        d2 = d*d
+        if Vector2Pair(centre, v).dist2() < d2:
+            return ["Centre", centre]
+        else:
+            return None
 
 class Rectangle(Graph):
     """ Concrete class for rectangles"""
