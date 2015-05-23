@@ -3,8 +3,7 @@
 from Model import *
 from View import *
 from Marker import EndPointMarker, MidPointMarker, SquareMarker
-from Temp import TempLine, TempCircle, TempRectangle
-from Graph import Vector2
+from Vectors import Vector2
 
 
 class Controller():
@@ -58,8 +57,6 @@ class Controller():
 
     def cmd_open(self):
         """Controls the process of opening a file
-
-
         """
         if self.model.dirty:  # App has unsaved data so ask user to save it
             if self.view.question_box(self.name, "Do you want to save your work?"):
@@ -107,8 +104,10 @@ class Controller():
             self.view.temp = None  # reset creation object
 
     def mouse_move(self, x, y):
+        """Control mouse move events"""
+        '''See if mouse snaps to anything'''
         self.view.erase_markers()
-        hit = self.model.graph.snap(Vector2(x,y), 20)
+        hit = self.model.snap(Vector2(x,y), 20)
         if hit:
             x = hit[1].x
             y = hit[1].y
@@ -116,76 +115,51 @@ class Controller():
                 self.view.marker_list.append(EndPointMarker(self.view, hit[1]))
             elif hit[0] == "Mid":
                 self.view.marker_list.append(MidPointMarker(self.view, hit[1]))
+        '''Process Construction lines'''
+        if self.view.temp:  # if there is a graphics operation in progress
+            '''See if the mouse snaps more'''
+            v = Vector2(x, y)
+            hit = self.view.temp.snap_more(v)
+            if hit[0] == "Sqr":
+                self.view.marker_list.append(SquareMarker(self.view, hit[1], hit[2]))  # TODO: Where do I get the first coordinate from?
+            self.view.temp.mouse_move(v)  # tell the graphics operation about the mouse move
 
-
-    def cmd_left_click(self, x, y):
+    def cmd_left_click(self, mx, my):
         # TODO: Investigate snap controls; Snap_to end_point, mid_point, in_line_with, grid
         """Called when user clicks left mouse button
         Note coordinates are windows relative, so top left corner of window is 0,0 wherever the window is on screen.
         """
         # TODO: Look at making a Mode class to eliminate all these if self.mode clauses
         # TODO: Add code for Select
-        if self.mode == "LINE":
-            if not self.view.temp:
-                hit = self.model.graph.snap(Vector2(x,y), 20)
-                if hit:
-                    x = hit[1].x
-                    y = hit[1].y
-                    if hit[0] == "End":
-                        self.view.marker_list.append(EndPointMarker(self.view, hit[1]))
-                    elif hit[0] == "Mid":
-                        self.view.marker_list.append(MidPointMarker(self.view, hit[1]))
-                    elif hit[1] == "Sqr":
-                        self.view.marker_list.append(SquareMarker(self.view, hit[1], hit[2]))
-                self.view.temp = TempLine(self.view, self, x, y)  # Create the temp object
-                self.x = x
-                self.y = y
-            else:
-                result = self.view.temp.close(x, y)  # Tell view to finish drawing object in progress
-                x = result[0]
-                y = result[1]
-                self.view.erase_markers()
-                self.view.temp = None  # Kill the temp object
-                self.model.add_line(self.x, self.y, x, y)
-                self.x = x
-                self.y = y
-        elif self.mode == "CIRCLE":
-            # TODO: Make circle via centre, radius as well as corner, corner
-            if not self.view.temp:
-                result = self.model.graph.snap(Vector2(x, y), 20)
-                if result:
-                    x = result[1].x
-                    y = result[1].y
-                self.view.temp = TempCircle(self.view, self, x, y)  # Create the temp object
-                self.x = x
-                self.y = y
-            else:
-                result = self.view.temp.close(x, y)  # Tell view to finish drawing object in progress
-                x = result[0]
-                y = result[1]
-                self.view.temp = None  # Kill the temp object
-                self.model.add_circle(self.x, self.y, x, y)
-                self.x = x
-                self.y = y
-        elif self.mode == "RECTANGLE":
-            if not self.view.temp:
-                result = self.model.graph.snap(Vector2(x, y), 20)
-                if result:
-                    x = result[1].x
-                    y = result[1].y
-                self.view.temp = TempRectangle(self.view, self, x, y)
-                self.x = x
-                self.y = y
-            else:
-                self.view.temp.close(x, y)  # Tell view to finish drawing object in progress
-                self.view.temp = None  # Kill the temp object
-                result = self.model.graph.snap(Vector2(x, y), 20)
-                if result:
-                    x = result[1].x
-                    y = result[1].y
-                self.model.add_rectangle(self.x, self.y, x, y)
-                self.x = x
-                self.y = y
+        v = Vector2(mx, my)
+        '''See if mouse snaps to near object'''
+        hit = self.model.snap(v, 20)
+        if hit:
+            v.x = hit[1].x
+            v.y = hit[1].y
+        if not self.view.temp:  # Are we in the construction stage
+            if self.mode == "LINE":
+                self.view.add_temp_line(v)
+            elif self.mode == "CIRCLE":
+                self.view.add_temp_circle(v)
+            elif self.mode == "RECTANGLE":
+                self.view.add_temp_rectangle(v)
+            self.x = v.x
+            self.y = v.y
+        else:
+            '''Line is in construction phase'''
+            self.view.temp.snap_more(v)  # TOGO: Bug here. These snaps override model snaps
+            self.view.temp.close(v)  # Tell view to finish drawing object in progress
+            self.view.erase_markers()
+            self.view.temp = None  # Kill the temp object
+            if self.mode == "LINE":
+                self.model.add_line(self.x, self.y, v.x, v.y)
+            elif self.mode == "CIRCLE":
+                self.model.add_circle(self.x, self.y, v.x, v.y)
+            elif self.mode == "RECTANGLE":
+                self.model.add_rectangle(self.x, self.y, v.x, v.y)
+            self.x = v.x
+            self.y = v.y
         # TODO: Add code for poly line
         # TODO: Add code for polygon
 

@@ -60,7 +60,10 @@ class Model():
         pass
 
     def load(self, file):
-        """Load the entire Graph Structure"""
+        """Load the entire Graph Structure
+        :param file: The open file object to load from
+        :return:
+        """
         try:
             self.graph = pickle.load(file)
             self.dirty = False
@@ -68,9 +71,19 @@ class Model():
             print("Error could not load %s" % file.name)
 
     def save(self, file):
-        """Save the entire Graph structure"""
+        """Save the entire Graph structure
+        :param file: The open file object to save to
+        """
         try:
             pickle.dump(self.graph, file=file)
             self.dirty = False
         except IOError:
             print("Error could not save %s" % file.name)
+
+    def snap(self, v, d):
+        """A pass through method to avoid Controller calling graph.snap directly.
+        :param v: Vector2
+        :param d: Distance allowed around v
+        :return: Either None for no snap or a Marker object if a snap detected
+        """
+        return self.graph.snap(v, d)

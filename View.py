@@ -1,6 +1,6 @@
 from tkinter import Tk, filedialog, Canvas, Menu, Frame, BOTH, YES, RAISED, Button, TOP, LEFT, Y, messagebox, ARC
 from PIL import Image, ImageTk
-
+from Temp import TempLine, TempCircle, TempRectangle
 
 class View():
     """This calls contains all the tkinter specific code"""
@@ -147,10 +147,14 @@ class View():
         """Called when window changes size"""
         pass
 
+    """
+    EVENTS
+    """
     def on_move(self, e):
         """Called when mouse moves"""
-        if self.temp:  # if there is a graphics operation in progress
-            self.temp.mouse_move(e.x, e.y)  # tell the graphics operation about the mouse move
+        # TODO: Don't do any logic here. Do it in control.mouse_move()
+        '''if self.temp:  # if there is a graphics operation in progress
+            self.temp.mouse_move(e.x, e.y)  # tell the graphics operation about the mouse move'''
         self.control.mouse_move(e.x, e.y)
 
     def key_escape(self, e):
@@ -164,9 +168,9 @@ class View():
         elif e.char == "c":
             self.control.cmd_circle()
 
-
-
-
+    """
+    STANDARD DIALOGS
+    """
     @staticmethod
     def question_box(title, text):
         """Just a wrapped for tkinter so command calls can be tkinter independent"""
@@ -195,6 +199,9 @@ class View():
                                         filetypes=(("PyCAD", "*.cad"),("All files", "*.*")),
                                         defaultextension=".cad")
 
+    """
+    MORE EVENTS
+    """
     def key_open(self, e):
         self.control.cmd_open()
 
@@ -269,4 +276,14 @@ class View():
             # TODO: Add more options when more graphics objects are available
         self.temp = None  # Clear the temp object.
 
+    def add_temp_line(self, v):
+        """Adds a new line construction object
+        :param v: The start vector
+        """
+        self.temp = TempLine(self, v)
 
+    def add_temp_rectangle(self, v):
+        self.temp = TempRectangle(self, v)
+
+    def add_temp_circle(self,v):
+        self.temp = TempCircle(self, v)
