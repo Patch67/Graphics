@@ -1,7 +1,9 @@
-"""Temp classes display graphics objects as they are being constructed"""
+"""Temp classes display graphics objects as they are being constructed.
+This is in the realms of the Model in the MVC framework so no references to View.
+"""
 import abc
 from Graph import Vector2
-
+from Marker import SquareMarker
 
 class Temp:
     """Abstract base class for all temporary graphics objects.
@@ -17,7 +19,7 @@ class Temp:
 
     @abc.abstractmethod
     def mouse_move(self, x, y):
-        """Shows the grpahics object as it is being created, i.e. as the mouse moves around"""
+        """Shows the graphics object as it is being created, i.e. as the mouse moves around"""
         pass
 
     @abc.abstractmethod
@@ -91,6 +93,8 @@ class TempRectangle(Temp):
         width = abs(self.x0 - x)
         height = abs(self.y0 - y)
         if abs(width - height) < 20:  # Near square
+            # Put some code here to make the square marker
+
             av = (width + height) / 2
             if self.x0 < x:
                 x = self.x0 + av

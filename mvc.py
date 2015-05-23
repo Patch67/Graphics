@@ -2,7 +2,7 @@
 
 from Model import *
 from View import *
-from Marker import EndPointMarker, MidPointMarker
+from Marker import EndPointMarker, MidPointMarker, SquareMarker
 from Temp import TempLine, TempCircle, TempRectangle
 from Graph import Vector2
 
@@ -135,6 +135,8 @@ class Controller():
                         self.view.marker_list.append(EndPointMarker(self.view, hit[1]))
                     elif hit[0] == "Mid":
                         self.view.marker_list.append(MidPointMarker(self.view, hit[1]))
+                    elif hit[1] == "Sqr":
+                        self.view.marker_list.append(SquareMarker(self.view, hit[1], hit[2]))
                 self.view.temp = TempLine(self.view, self, x, y)  # Create the temp object
                 self.x = x
                 self.y = y
