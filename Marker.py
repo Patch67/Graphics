@@ -5,6 +5,7 @@ Markers are part of the View, i.e. they interact with View elements such as canv
 
 __author__ = 'Patrick'
 
+
 class Marker:
     """Base class for all markers"""
     def __init__(self, view, v0):
@@ -32,13 +33,22 @@ class MidPointMarker(Marker):
 
 
 class CentreMarker(Marker):
+    """Marks a little red circle at the centre"""
     def __init__(self, view, v0):
         super(CentreMarker, self).__init__(view, v0)
         self.view.marker_list.append(self.view.canvas.create_oval(self.v0.x - 5, self.v0.y - 5, self.v0.x + 5, self.v0.y + 5, outline=self.colour))
 
 
+class InlineMarker(Marker):
+    """Marks red line between matching model point and snapped cursor position"""
+    def __init__(self, view, v0, v1):
+        super(InlineMarker, self).__init__(view, v0)
+        self.v1 = v1
+        self.view.marker_list.append(self.view.canvas.create_line(self.v0.x, self.v0.y, self.v1.x , self.v1.y, fill=self.colour))
+
+
 class SquareMarker(Marker):
-    """Marks a mid point with a little red cross"""
+    """Marks red line diagonal between fist point and snapped cursor position"""
     def __init__(self, view, v0, v1):
         super(SquareMarker, self).__init__(view, v0)
         self.v1 = v1

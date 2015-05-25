@@ -1,4 +1,4 @@
-from Graph import Group, Line, Rectangle, Circle
+from Graph import Group, Line, Rectangle, Circle, Pline
 import pickle
 
 
@@ -44,8 +44,8 @@ class Model():
         self.dirty = True
 
     def add_poly_line(self):
-        # TODO: Add polyline
-        pass
+        self.graph.add(Pline(x0, y0, nodes))
+        self.dirty = true
 
     def add_polygon(self):
         # TODO: Add polygon

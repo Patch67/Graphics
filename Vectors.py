@@ -4,8 +4,6 @@ from math import sqrt, atan  # Only needed because of Vector2
 
 class Vector2:
     """Class of 2 Dimensional Vectors and associated methods"""
-
-    # TODO: Move this class into a file of it's own.
     def __init__(self, x, y):
         self.x, self.y = x, y;
 

@@ -1,10 +1,15 @@
 from tkinter import Tk, filedialog, Canvas, Menu, Frame, BOTH, YES, RAISED, Button, TOP, LEFT, Y, messagebox, ARC
 from PIL import Image, ImageTk
-from Temp import TempLine, TempCircle, TempRectangle
+from Temp import TempLine, TempCircle, TempRectangle, TempPline
 
-class View():
-    """This calls contains all the tkinter specific code"""
+class View:
+    """Everything to do with the View from MVC.
+    Interfaces with the tkinter environment
+    """
 
+    """
+    Control methods
+    """
     def __init__(self, control):
         """View constructor"""
         self.control = control  # Link back to talk to controller
@@ -16,9 +21,11 @@ class View():
         self.marker_list = []  # List of marker objects as the result of a snap find
         self.temp = None  # This is for a Temp object when drawing a graphics object is under construction
         self.context = None
+        self.pline = None
 
         self.create_menus()
         self.create_context_menus()
+        self.create_pline_menu()
         self.create_toolbar()
 
         self.canvas.pack(fill=BOTH, expand=YES)
@@ -74,6 +81,7 @@ class View():
         drawing_menu.add_command(label="Line", command=self.control.cmd_line)
         drawing_menu.add_command(label="Rectangle", command=self.control.cmd_rectangle)
         drawing_menu.add_command(label="Circle", command=self.control.cmd_circle)
+        drawing_menu.add_command(label="Pline", command=self.control.cmd_pline)
         drawing_menu.add_command(label="Group", command=self.control.cmd_null)
         drawing_menu.add_command(label="Instance", command=self.control.cmd_null)
         menu_bar.add_cascade(label="Drawing", menu=drawing_menu)
@@ -107,6 +115,11 @@ class View():
         # TODO: Add more options such as cut, copy, paste, rotate, scale, etc.
         self.context.add_command(label="Dirty", command=self.control.cmd_null)
         self.context.add_command(label="Clean", command=self.control.cmd_null)
+
+    def create_pline_menu(self):
+        self.pline = Menu(self.master, tearoff=0)
+        self.pline.add_command(label="Close", command=self.control.cmd_pline_close)
+        self.pline.add_command(label="End", command=self.control.cmd_pline_end)
 
     def create_toolbar(self):
         """Creates toolbar"""
@@ -143,10 +156,6 @@ class View():
         self.canvas.bind("<Key>", self.on_key)
         self.master.protocol('WM_DELETE_WINDOW', self.control.cmd_exit) # Window closing event
 
-    def on_resize(self, e):
-        """Called when window changes size"""
-        pass
-
     """
     EVENTS
     """
@@ -167,6 +176,24 @@ class View():
             self.control.cmd_rectangle()
         elif e.char == "c":
             self.control.cmd_circle()
+        elif e.char == "p":
+            self.control.cmd_pline()
+
+    def on_resize(self, e):
+        """Called when window changes size"""
+        pass
+
+    def key_open(self, e):
+        self.control.cmd_open()
+
+    def key_save(self, e):
+        self.control.cmd_open()
+
+    def left_click(self, e):
+        self.control.cmd_left_click(e.x, e.y)  # e.x & e.y are canvas relative
+
+    def right_click(self, e):
+        self.control.cmd_right_click(e.x_root, e.y_root)  # e.x_root & e.y_root are screen relative
 
     """
     STANDARD DIALOGS
@@ -200,22 +227,13 @@ class View():
                                         defaultextension=".cad")
 
     """
-    MORE EVENTS
+    MENU EVENTS
     """
-    def key_open(self, e):
-        self.control.cmd_open()
-
-    def key_save(self, e):
-        self.control.cmd_open()
-
-    def left_click(self, e):
-        self.control.cmd_left_click(e.x, e.y)  # e.x & e.y are canvas relative
-
-    def right_click(self, e):
-        self.control.cmd_right_click(e.x_root, e.y_root)  # e.x_root & e.y_root are screen relative
-        
     def show_context_menu(self, x, y):
         self.context.tk_popup(x, y, 0)
+
+    def show_pline_context_menu(self, x, y):
+        self.pline.tk_popup(x, y, 0)
 
     def show_toolbar(self):
         # TODO: Make this tool bar open in the right place every time, not just the first time
@@ -231,8 +249,9 @@ class View():
     def hide_toolbar(self):
         self.tool_bar.pack_forget()
 
-    ''' View methods to draw Graph objects'''
-
+    """
+    View methods to draw Graph objects
+    """
     def redraw(self, graph):
         """In tkinter redraw is not needed because canvas graphics are permanent
         In an application with transient graphics we would need to redraw all the objects
@@ -260,9 +279,6 @@ class View():
         self.canvas.create_rectangle(rectangle.v0.x, rectangle.v0.y, rectangle.v1.x, rectangle.v1.y)
         self.temp = None  # Clear the temp object.
 
-    def clear(self):
-        self.canvas.delete("all")
-
     def make_group(self, group):
         self.clear()
         for child in group.children:
@@ -276,6 +292,12 @@ class View():
             # TODO: Add more options when more graphics objects are available
         self.temp = None  # Clear the temp object.
 
+    def clear(self):
+        self.canvas.delete("all")
+
+    """
+    Set up temporary construction objects
+    """
     def add_temp_line(self, v):
         """Adds a new line construction object
         :param v: The start vector
@@ -287,3 +309,6 @@ class View():
 
     def add_temp_circle(self,v):
         self.temp = TempCircle(self, v)
+
+    def add_temp_pline(self, v):
+        self.temp = TempPline(self, v)

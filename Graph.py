@@ -18,61 +18,76 @@ class Graph:
     @abc.abstractmethod
     def __init__(self):
         pass
-    
+
     @abc.abstractmethod
     def snap(self, v, d):
         """Search for coordinates within d - distance or v - Vector, i.e. Mouse click"""
         pass
 
+
 class Line(Graph):
     """ Concrete class for graphics lines"""
+
     def __init__(self, x0, y0, x1, y1):
-        self.v0 = Vector2(x0,y0)
-        self.v1 = Vector2(x1,y1)
+        self.v0 = Vector2(x0, y0)
+        self.v1 = Vector2(x1, y1)
 
     def snap(self, v, d):
         """If start point, end point or mid point is within d units return
         their coordinates.
         if not return None, i.e. no match"""
 
-        d *= d  # d is distance squared
+        d2 = d * d  # d is distance squared
 
         '''Check the two end points'''
-        if Vector2Pair(self.v0, v).dist2() < d:  # if distance <5. Note use of 25 which is 5 squared
+        if Vector2Pair(self.v0, v).dist2() < d2:
             return ["End", self.v0]  # return coordinates of start point
-        if Vector2Pair(self.v1, v).dist2() < d:
+        if Vector2Pair(self.v1, v).dist2() < d2:
             return ["End", self.v1]  # return coordinates of end point
 
         '''Check the middle point'''
         mid = Vector2Pair(self.v0, self.v1).mid()
-        if Vector2Pair(mid, v).dist2() < d:
+        if Vector2Pair(mid, v).dist2() < d2:
             return ["Mid", mid]  # return coordinates of middle point
+
+        '''Check for line ups'''
+        if abs(self.v0.x - v.x) < d:
+            return ["Inline", Vector2(self.v0.x, v.y), self.v0]
+        if abs(self.v0.y - v.y) < d:
+            return ["Inline", Vector2(v.x, self.v0.y), self.v0]
+        if abs(self.v1.x - v.x) < d:
+            return ["Inline", Vector2(self.v1.x, v.y), self.v1]
+        if abs(self.v1.y - v.y) < d:
+            return ["Inline", Vector2(v.x, self.v1.y), self.v1]
 
         return None  # No matches found
 
 
 class Circle(Graph):
     """ Concrete class for graphics circles"""
+
     def __init__(self, x0, y0, x1, y1):
         self.v0 = Vector2(x0, y0)
         self.v1 = Vector2(x1, y1)
 
     def snap(self, v, d):
         centre = Vector2Pair(self.v0, self.v1).mid()
-        d2 = d*d
+        d2 = d * d
         if Vector2Pair(centre, v).dist2() < d2:
             return ["Centre", centre]
         else:
             return None
 
+
 class Rectangle(Graph):
     """ Concrete class for rectangles"""
+
     def __init__(self, x0, y0, x1, y1):
         self.v0 = Vector2(x0, y0)
         self.v1 = Vector2(x1, y1)
 
     def snap(self, v, d):
-        d2 = d*d  # Squares are quicker than sqrt
+        d2 = d * d  # Squares are quicker than sqrt
         '''Check the four corners'''
         if Vector2Pair(self.v0, v).dist2() < d2:
             return ["End", self.v0]
@@ -117,17 +132,24 @@ class Text(Graph):
         return None
 
 
+class Pline(Graph):
+    def __init__(self, x, y, nodes):
+        self.x = x
+        self.y = y
+        self.nodes = nodes
+
+
 class Group(Graph):
     """ Concrete class for graphics group
     Implements the composite pattern
     Based on the MVC architectural pattern so only for data handling, not actually drawing
     """
 
-    def __init__(self,name):
+    def __init__(self, name):
         self.name = name
-        self.children=[]
+        self.children = []
 
-    def add(self,graph):
+    def add(self, graph):
         self.children.append(graph)
 
     def snap(self, v, d):
@@ -136,4 +158,3 @@ class Group(Graph):
             if marker:  # if there is a find
                 return marker  # return a the coordinates
         return None  # if no finds then return None
-

@@ -40,6 +40,7 @@ class Temp:
         """
         return ["None", v]
 
+
 class TempLine(Temp):
     """Class for the construction of a line"""
     def __init__(self, view, v):
@@ -66,6 +67,7 @@ class TempLine(Temp):
         elif abs(self.v0.y - v.y) < 10:  # Near horizontal
             v.y = self.v0.y
         return ["Vert", v]
+
 
 class TempRectangle(Temp):
     """Class for the construction of a rectangle"""
@@ -105,6 +107,7 @@ class TempRectangle(Temp):
         else:
             return ["None", v]
 
+
 class TempCircle(Temp):
     """Class for the construction of a circle"""
     def __init__(self, view, v):
@@ -142,3 +145,19 @@ class TempCircle(Temp):
             return ["Sqr",self.v0, self.v1]
         else:
             return ["None", v]
+
+
+class TempPline(Temp):
+    """Class for the construction of a circle"""
+    def __init__(self, view, v):
+        super(TempPline, self).__init__(view, v)
+        self.nodes = []
+
+    def mouse_move(self, v):
+        pass
+
+    def left_click(self, v):
+        self.nodes.append(v)
+
+    def close(self, v):
+        pass

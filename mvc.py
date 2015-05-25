@@ -2,12 +2,12 @@
 
 from Model import *
 from View import *
-from Marker import EndPointMarker, MidPointMarker, SquareMarker, CentreMarker
+from Marker import EndPointMarker, MidPointMarker, SquareMarker, CentreMarker, InlineMarker
 from Vectors import Vector2
 
 
 class Controller():
-    """This contains the business logic of the application"""
+    """The business logic of the application."""
 
     def __init__(self, name):
         """Constructor"""
@@ -46,7 +46,7 @@ class Controller():
         self.set_title()
         self.view.redraw(self.model.graph)  # In tkinter graphics objects are permanent so no need to redraw
 
-    '''Commands - Responses to GUI events'''
+    '''COMMANDS - Responses to GUI events'''
 
     def cmd_new(self):
         if self.model.dirty:
@@ -117,13 +117,15 @@ class Controller():
                 self.view.marker_list.append(MidPointMarker(self.view, hit[1]))
             elif hit[0] == "Centre":
                 self.view.marker_list.append(CentreMarker(self.view, hit[1]))
+            elif hit[0] == "Inline":
+                self.view.marker_list.append(InlineMarker(self.view, hit[1], hit[2]))
         '''Process Construction lines'''
         if self.view.temp:  # if there is a graphics operation in progress
             '''See if the mouse snaps more'''
             v = Vector2(x, y)
             hit = self.view.temp.snap_more(v)
             if hit[0] == "Sqr":
-                self.view.marker_list.append(SquareMarker(self.view, hit[1], hit[2]))  # TODO: Where do I get the first coordinate from?
+                self.view.marker_list.append(SquareMarker(self.view, hit[1], hit[2]))  # Note 2 coordinates here
             self.view.temp.mouse_move(v)  # tell the graphics operation about the mouse move
 
     def cmd_left_click(self, mx, my):
@@ -146,27 +148,42 @@ class Controller():
                 self.view.add_temp_circle(v)
             elif self.mode == "RECTANGLE":
                 self.view.add_temp_rectangle(v)
+            elif self.mode == "PLINE":
+                self.view.add_temp_pline(v)
             self.x = v.x
             self.y = v.y
         else:
             '''Line is in construction phase'''
-            self.view.temp.snap_more(v)  # TOGO: Bug here. These snaps override model snaps
-            self.view.temp.close(v)  # Tell view to finish drawing object in progress
+            self.view.temp.snap_more(v)  # TODO: Bug here. These snaps override model snaps
             self.view.erase_markers()
-            self.view.temp = None  # Kill the temp object
             if self.mode == "LINE":
+                self.view.temp.close(v)
+                self.view.temp = None  # Kill the temp object
                 self.model.add_line(self.x, self.y, v.x, v.y)
             elif self.mode == "CIRCLE":
+                self.view.temp.close(v)
+                self.view.temp = None  # Kill the temp object
                 self.model.add_circle(self.x, self.y, v.x, v.y)
             elif self.mode == "RECTANGLE":
+                self.view.temp.close(v)
+                self.view.temp = None  # Kill the temp object
                 self.model.add_rectangle(self.x, self.y, v.x, v.y)
+            elif self.mode == "PLINE":
+                # self.view.temp.close(v)  # Don't close pline yet
+                # self.view.temp = None  # Don't kill the temp object yet
+                self.view.temp.left_click(v)
+                # self.model.add_poly_line(v.x, v.y)  # Don't add pline yet
             self.x = v.x
             self.y = v.y
         # TODO: Add code for poly line
         # TODO: Add code for polygon
 
     def cmd_right_click(self, x, y):
-        self.view.show_context_menu(x, y)
+        """Show context menu. This depends on the mode we are in"""
+        if self.mode == "PLINE":
+            self.view.show_pline_context_menu(x, y)
+        else:
+            self.view.show_context_menu(x, y)  # Show generic context menu
 
     def cmd_null(self):
         self.view.info_box(self.name, "Not yet implemented")
@@ -179,7 +196,7 @@ class Controller():
         else:
             self.view.hide_toolbar()
 
-    # Drawing Commands
+    '''DRAWING COMMANDS'''
     def cmd_line(self):
         self.mode = "LINE"
 
@@ -190,6 +207,18 @@ class Controller():
     def cmd_rectangle(self):
         self.mode = "RECTANGLE"
 
+    def cmd_pline(self):
+        self.mode = "PLINE"
+
+    def cmd_pline_close(self):
+        self.cmd_pline_end()
+
+    def cmd_pline_end(self):
+        self.view.temp.close(v)  # Don't close pline yet
+        self.view.temp = None  # Don't kill the temp object yet
+        self.model.add_poly_line(v.x, v.y)  # Don't add pline yet
+
+    '''MISCANENEOUS'''
     def get_title(self):
         """Makes the title for the Window"""
         if self.model.dirty:
@@ -204,6 +233,6 @@ class Controller():
         """Sets the title of the Window"""
         self.view.set_title(self.get_title())
 
-# Main program
+'''MAIN PROGRAM'''
 controller = Controller("My MVC GUI")  # Construct a controller
 
