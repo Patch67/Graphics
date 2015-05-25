@@ -32,8 +32,6 @@ class Line(Graph):
         self.v0 = v0
         self.v1 = v1
 
-
-
     def snap(self, v, d):
         """If start point, end point or mid point is within d units return
         their coordinates.
@@ -54,13 +52,17 @@ class Line(Graph):
 
         '''Check for line ups'''
         if abs(self.v0.x - v.x) < d:
-            return ["Inline", Vector2(self.v0.x, v.y), self.v0]
+            v.x = self.v0.x
+            return ["Inline", v, self.v0]
         if abs(self.v0.y - v.y) < d:
-            return ["Inline", Vector2(v.x, self.v0.y), self.v0]
+            v.y = self.v0.y
+            return ["Inline", v, self.v0]
         if abs(self.v1.x - v.x) < d:
-            return ["Inline", Vector2(self.v1.x, v.y), self.v1]
+            v.x = self.v1.x
+            return ["Inline", v, self.v1]
         if abs(self.v1.y - v.y) < d:
-            return ["Inline", Vector2(v.x, self.v1.y), self.v1]
+            v.y = self.v1.y
+            return ["Inline", v, self.v1]
 
         return None  # No matches found
 

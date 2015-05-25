@@ -136,13 +136,16 @@ class Controller():
         """
         # TODO: Look at making a Mode class to eliminate all these if self.mode clauses
         # TODO: Add code for Select
+        print("Mouse click %d, %d" % (mx, my))
         v = Vector2(mx, my)
         '''See if mouse snaps to near object'''
         hit = self.model.snap(v, 20)
         if hit:
             v.x = hit[1].x
             v.y = hit[1].y
-        if not self.view.temp:  # Are we in the construction stage
+            print("Hit at %d, %d" % (v.x, v.y))
+        if not self.view.temp:  # If not yet in the construction stage
+            self.clicks.append(v)  # Add first click to clicks list
             if self.mode == "LINE":
                 self.view.add_temp_line(v)
             elif self.mode == "CIRCLE":
@@ -151,34 +154,31 @@ class Controller():
                 self.view.add_temp_rectangle(v)
             elif self.mode == "PLINE":
                 self.view.add_temp_pline(v)
-        else:
-            '''Line is in construction phase'''
+        else:  # We are in the construction phase
             self.view.temp.snap_more(v)  # TODO: Bug here. These snaps override model snaps
+            self.clicks.append(v)  # There are no more snaps so v can be written to the clicks list
             self.view.erase_markers()
             if self.mode == "LINE":
                 self.view.temp.close(v)
                 self.view.temp = None  # Kill the temp object
-                self.clicks.append(v)
+                for click in self.clicks:
+                    print("Click %d, %d" % (click.x, click.y))
                 self.model.add_line(self.clicks)
                 self.clicks = []
             elif self.mode == "CIRCLE":
                 self.view.temp.close(v)
                 self.view.temp = None  # Kill the temp object
-                self.clicks.append(v)
                 self.model.add_circle(self.clicks)
                 self.clicks = []
             elif self.mode == "RECTANGLE":
                 self.view.temp.close(v)
                 self.view.temp = None  # Kill the temp object
-                self.clicks.append(v)
                 self.model.add_rectangle(self.clicks)
                 self.clicks = []
             elif self.mode == "PLINE":
-                self.clicks.append(v)
                 self.view.temp.add_node(v)
         self.x = v.x
         self.y = v.y
-        self.clicks.append(v)
         # TODO: Add code for poly line
         # TODO: Add code for polygon
 
