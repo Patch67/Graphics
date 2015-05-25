@@ -20,6 +20,7 @@ class Controller():
         self.mode = "SELECT"
         self.x = 0  # Previous click coordinates
         self.y = 0  # Previous click coordinates
+        self.clicks = []  # A list of clicks, not just one.
         self.view.run()  # Start the GUI
 
     @property
@@ -150,8 +151,6 @@ class Controller():
                 self.view.add_temp_rectangle(v)
             elif self.mode == "PLINE":
                 self.view.add_temp_pline(v)
-            self.x = v.x
-            self.y = v.y
         else:
             '''Line is in construction phase'''
             self.view.temp.snap_more(v)  # TODO: Bug here. These snaps override model snaps
@@ -159,27 +158,33 @@ class Controller():
             if self.mode == "LINE":
                 self.view.temp.close(v)
                 self.view.temp = None  # Kill the temp object
-                self.model.add_line(self.x, self.y, v.x, v.y)
+                self.clicks.append(v)
+                self.model.add_line(self.clicks)
+                self.clicks = []
             elif self.mode == "CIRCLE":
                 self.view.temp.close(v)
                 self.view.temp = None  # Kill the temp object
-                self.model.add_circle(self.x, self.y, v.x, v.y)
+                self.clicks.append(v)
+                self.model.add_circle(self.clicks)
+                self.clicks = []
             elif self.mode == "RECTANGLE":
                 self.view.temp.close(v)
                 self.view.temp = None  # Kill the temp object
-                self.model.add_rectangle(self.x, self.y, v.x, v.y)
+                self.clicks.append(v)
+                self.model.add_rectangle(self.clicks)
+                self.clicks = []
             elif self.mode == "PLINE":
-                # self.view.temp.close(v)  # Don't close pline yet
-                # self.view.temp = None  # Don't kill the temp object yet
-                self.view.temp.left_click(v)
-                # self.model.add_poly_line(v.x, v.y)  # Don't add pline yet
-            self.x = v.x
-            self.y = v.y
+                self.clicks.append(v)
+                self.view.temp.add_node(v)
+        self.x = v.x
+        self.y = v.y
+        self.clicks.append(v)
         # TODO: Add code for poly line
         # TODO: Add code for polygon
 
     def cmd_right_click(self, x, y):
         """Show context menu. This depends on the mode we are in"""
+        self.right = Vector2(x, y)
         if self.mode == "PLINE":
             self.view.show_pline_context_menu(x, y)
         else:
@@ -214,11 +219,11 @@ class Controller():
         self.cmd_pline_end()
 
     def cmd_pline_end(self):
-        self.view.temp.close(v)  # Don't close pline yet
-        self.view.temp = None  # Don't kill the temp object yet
-        self.model.add_poly_line(v.x, v.y)  # Don't add pline yet
+        self.view.temp.close(self.right)  # Close pline wit the last right click
+        self.view.temp = None  # Kill the temp object
+        self.model.add_poly_line(self.clicks)  # Add pline
 
-    '''MISCANENEOUS'''
+    '''MISCELLANEOUS'''
     def get_title(self):
         """Makes the title for the Window"""
         if self.model.dirty:

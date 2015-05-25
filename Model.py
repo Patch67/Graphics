@@ -31,21 +31,21 @@ class Model():
         self.__dirty = dirty  # Change value
         self.controller.dirty_changed()  # Notify Controller that value changed
 
-    def add_line(self, x0, y0, x1, y1):
-        self.graph.add(Line(x0, y0, x1, y1))
-        self.dirty = True
-    
-    def add_rectangle(self, x0, y0, x1, y1):
-        self.graph.add(Rectangle(x0, y0, x1, y1))
+    def add_line(self, nodes):
+        self.graph.add(Line(nodes[0], nodes[1]))
         self.dirty = True
 
-    def add_circle(self, x0, y0, x1, y1):
-        self.graph.add(Circle(x0, y0, x1, y1))
+    def add_rectangle(self, nodes):
+        self.graph.add(Rectangle(nodes[0], nodes[1]))
         self.dirty = True
 
-    def add_poly_line(self):
-        self.graph.add(Pline(x0, y0, nodes))
-        self.dirty = true
+    def add_circle(self, nodes):
+        self.graph.add(Circle(nodes[0], nodes[1]))
+        self.dirty = True
+
+    def add_poly_line(self, nodes):
+        self.graph.add(Pline( nodes))
+        self.dirty = True
 
     def add_polygon(self):
         # TODO: Add polygon
@@ -55,7 +55,7 @@ class Model():
         # TODO: Add code for group
         pass
 
-    def add_instance(self, x, y):
+    def add_instance(self):
         # TODO: Add code for instance
         pass
 

@@ -151,13 +151,26 @@ class TempPline(Temp):
     """Class for the construction of a circle"""
     def __init__(self, view, v):
         super(TempPline, self).__init__(view, v)
-        self.nodes = []
+        self.nodes = [v]
+
+    def add_node(self, v):
+        self.nodes.append(v)
+        self.canvas.create_line(self.nodes[-2].x, self.nodes[-2].y, v.x, v.y)  # Create new temp line
 
     def mouse_move(self, v):
-        pass
-
-    def left_click(self, v):
-        self.nodes.append(v)
+        # erase old line, if it exists else draw new line
+        if self.id:
+            self.canvas.delete(self.id)
+        self.id = self.canvas.create_line(self.nodes[-1].x, self.nodes[-1].y, v.x, v.y)  # Create new temp line
 
     def close(self, v):
-        pass
+        """Kill the temporary construction line and create the finished item"""
+        self.canvas.delete(self.id)
+        self.id = None
+        self.nodes.append(v)  # Add the last node
+        v0 = self.nodes.pop(0)
+        for node in self.nodes:
+            self.canvas.create_line(self.v0.x, self.v0.y, node.x, node.y)
+            self.v0 = node
+        self.nodes = []
+

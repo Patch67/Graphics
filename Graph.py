@@ -28,9 +28,11 @@ class Graph:
 class Line(Graph):
     """ Concrete class for graphics lines"""
 
-    def __init__(self, x0, y0, x1, y1):
-        self.v0 = Vector2(x0, y0)
-        self.v1 = Vector2(x1, y1)
+    def __init__(self, v0, v1):
+        self.v0 = v0
+        self.v1 = v1
+
+
 
     def snap(self, v, d):
         """If start point, end point or mid point is within d units return
@@ -66,9 +68,9 @@ class Line(Graph):
 class Circle(Graph):
     """ Concrete class for graphics circles"""
 
-    def __init__(self, x0, y0, x1, y1):
-        self.v0 = Vector2(x0, y0)
-        self.v1 = Vector2(x1, y1)
+    def __init__(self, v0, v1):
+        self.v0 = v0
+        self.v1 = v1
 
     def snap(self, v, d):
         centre = Vector2Pair(self.v0, self.v1).mid()
@@ -82,9 +84,9 @@ class Circle(Graph):
 class Rectangle(Graph):
     """ Concrete class for rectangles"""
 
-    def __init__(self, x0, y0, x1, y1):
-        self.v0 = Vector2(x0, y0)
-        self.v1 = Vector2(x1, y1)
+    def __init__(self, v0, v1):
+        self.v0 = v0
+        self.v1 = v1
 
     def snap(self, v, d):
         d2 = d * d  # Squares are quicker than sqrt
@@ -122,9 +124,8 @@ class Text(Graph):
     Based on the MVC architectural pattern so only for data handling, not actually drawing
     """
 
-    def __init__(self, x, y, text):
-        self.x = x
-        self.y = y
+    def __init__(self, v0, text):
+        self.v0 = v0
         self.text = text
 
     def snap(self, v, d):
@@ -133,9 +134,7 @@ class Text(Graph):
 
 
 class Pline(Graph):
-    def __init__(self, x, y, nodes):
-        self.x = x
-        self.y = y
+    def __init__(self, nodes):
         self.nodes = nodes
 
 

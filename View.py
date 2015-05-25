@@ -279,6 +279,14 @@ class View:
         self.canvas.create_rectangle(rectangle.v0.x, rectangle.v0.y, rectangle.v1.x, rectangle.v1.y)
         self.temp = None  # Clear the temp object.
 
+    def make_pline(self, line):
+        """Add a new, permanent, line to canvas"""
+        v0 = line.nodes.pop(0)
+        for node in line.nodes:
+            self.canvas.create_line(v0.x, v0.y, node.x, node.y)
+            v0 = node
+        self.temp = None  # Clear the temp object.
+
     def make_group(self, group):
         self.clear()
         for child in group.children:
@@ -289,7 +297,8 @@ class View:
                 self.make_circle(child)
             elif t == "Rectangle":
                 self.make_rectangle(child)
-            # TODO: Add more options when more graphics objects are available
+            elif t == "Pline":
+                self.make_pline(child)
         self.temp = None  # Clear the temp object.
 
     def clear(self):
