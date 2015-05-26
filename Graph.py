@@ -136,9 +136,23 @@ class Text(Graph):
 
 
 class Pline(Graph):
-    def __init__(self, nodes):
+    def __init__(self, nodes, close):
         self.nodes = nodes
+        self.close = close
 
+    def snap(self, v, d):
+        d2 = d*d
+        for node in self.nodes:  # Run through every node for an end point match
+            if Vector2Pair(v, node).dist2() < d2:
+                return ["End", node]  # If the snap result is a class then we won't have to do loads of if's later
+        for i in range(0,len(self.nodes)-1):  # Run through every line for an mid point match
+            mid = Vector2Pair(self.nodes[i], self.nodes[i+1]).mid()
+            if Vector2Pair(v, mid).dist2() < d2:
+                return ["Mid", mid]
+        if self.close:
+            mid = Vector2Pair(self.nodes[0], self.nodes[-1]).mid()  # Check mid point between first and last nodes
+            if Vector2Pair(v, mid).dist2() < d2:
+                return ["Mid", mid]
 
 class Group(Graph):
     """ Concrete class for graphics group

@@ -43,8 +43,8 @@ class Model():
         self.graph.add(Circle(nodes[0], nodes[1]))
         self.dirty = True
 
-    def add_poly_line(self, nodes):
-        self.graph.add(Pline( nodes))
+    def add_poly_line(self, nodes, close):
+        self.graph.add(Pline( nodes, close))
         self.dirty = True
 
     def add_polygon(self):

@@ -163,14 +163,13 @@ class TempPline(Temp):
             self.canvas.delete(self.id)
         self.id = self.canvas.create_line(self.nodes[-1].x, self.nodes[-1].y, v.x, v.y)  # Create new temp line
 
-    def close(self, v):
+    def close(self, close):
         """Kill the temporary construction line and create the finished item"""
         self.canvas.delete(self.id)
         self.id = None
-        self.nodes.append(v)  # Add the last node
-        v0 = self.nodes.pop(0)
-        for node in self.nodes:
-            self.canvas.create_line(self.v0.x, self.v0.y, node.x, node.y)
-            self.v0 = node
+        for i in range(len(self.nodes)-1):
+            self.canvas.create_line(self.nodes[i].x, self.nodes[i].y, self.nodes[i+1].x, self.nodes[i+1].y)
+        if close:
+            self.canvas.create_line(self.nodes[0].x, self.nodes[0].y, self.nodes[-1].x, self.nodes[-1].y)
         self.nodes = []
 

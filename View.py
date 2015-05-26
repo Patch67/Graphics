@@ -279,12 +279,15 @@ class View:
         self.canvas.create_rectangle(rectangle.v0.x, rectangle.v0.y, rectangle.v1.x, rectangle.v1.y)
         self.temp = None  # Clear the temp object.
 
-    def make_pline(self, line):
+    def make_pline(self, pline):
         """Add a new, permanent, line to canvas"""
-        v0 = line.nodes.pop(0)
-        for node in line.nodes:
-            self.canvas.create_line(v0.x, v0.y, node.x, node.y)
-            v0 = node
+        start = pline.nodes.pop(0)
+        temp = start
+        for node in pline.nodes:
+            self.canvas.create_line(temp.x, temp.y, node.x, node.y)
+            temp = node
+        if pline.close:
+            self.canvas.create_line(node.x, node.y, start.x, start.y)
         self.temp = None  # Clear the temp object.
 
     def make_group(self, group):

@@ -108,7 +108,7 @@ class Controller():
         """Control mouse move events"""
         '''See if mouse snaps to anything'''
         self.view.erase_markers()
-        hit = self.model.snap(Vector2(x,y), 20)
+        hit = self.model.snap(Vector2(x, y), 20)
         if hit:
             x = hit[1].x
             y = hit[1].y
@@ -216,12 +216,14 @@ class Controller():
         self.mode = "PLINE"
 
     def cmd_pline_close(self):
-        self.cmd_pline_end()
+        self.view.temp.close(True)  # Close pline with the last right click
+        self.view.temp = None  # Kill the temp object
+        self.model.add_poly_line(self.clicks, True)  # Add pline
 
     def cmd_pline_end(self):
-        self.view.temp.close(self.right)  # Close pline wit the last right click
+        self.view.temp.close(False)  # Close pline with the last right click
         self.view.temp = None  # Kill the temp object
-        self.model.add_poly_line(self.clicks)  # Add pline
+        self.model.add_poly_line(self.clicks, False)  # Add pline
 
     '''MISCELLANEOUS'''
     def get_title(self):
