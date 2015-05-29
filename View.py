@@ -1,6 +1,8 @@
-from tkinter import Tk, filedialog, Canvas, Menu, Frame, BOTH, YES, RAISED, Button, TOP, LEFT, Y, messagebox, ARC
+from tkinter import Tk, filedialog, Canvas, Menu, Frame, BOTH, YES, RAISED, Button, TOP, LEFT, Y, messagebox,\
+    IntVar, Checkbutton
 from PIL import Image, ImageTk
 from Temp import TempLine, TempCircle, TempRectangle, TempPline
+
 
 class View:
     """Everything to do with the View from MVC.
@@ -86,6 +88,10 @@ class View:
         drawing_menu.add_command(label="Instance", command=self.control.cmd_null)
         menu_bar.add_cascade(label="Drawing", menu=drawing_menu)
 
+        settings_menu = Menu(menu_bar, tearoff=0)
+        settings_menu.add_command(label="Snap", command=self.control.cmd_null)
+        menu_bar.add_cascade(label="Settings", menu=settings_menu)
+
         # toolbar menus
         tool_bar_menu = Menu(menu_bar, tearoff=0)
         tool_bar_menu.add_checkbutton(label='Tools', command=self.control.cmd_tools)
@@ -108,6 +114,8 @@ class View:
         menu_bar.add_cascade(label = "Tools", menu = x_tools)
 
         self.master.config(menu=menu_bar)  # lock in menu_bar
+
+
 
     def create_context_menus(self):
         """Creates the connects menus, i.e. for right click"""
@@ -161,9 +169,6 @@ class View:
     """
     def on_move(self, e):
         """Called when mouse moves"""
-        # TODO: Don't do any logic here. Do it in control.mouse_move()
-        '''if self.temp:  # if there is a graphics operation in progress
-            self.temp.mouse_move(e.x, e.y)  # tell the graphics operation about the mouse move'''
         self.control.mouse_move(e.x, e.y)
 
     def key_escape(self, e):

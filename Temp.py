@@ -15,7 +15,7 @@ class Temp:
     @abc.abstractmethod
     def __init__(self, view, v):
         self.canvas = view.canvas
-        self.model = None  # controller.model
+        #self.model = None  # controller.model
         self.v0 = v
         self.v1 = None
         self.id = None  # Reference to construction object
@@ -58,7 +58,7 @@ class TempLine(Temp):
         self.id = None
         self.canvas.create_line(self.v0.x, self.v0.y, v.x, v.y)
 
-    def snap_more(self, v):
+    def snap_more_disabled(self, v):
         """Overrides Temp.snap_more
         :param v: v is an referenced object which may well have it's contents altered.
         """
@@ -81,11 +81,12 @@ class TempRectangle(Temp):
         self.id = self.canvas.create_rectangle(self.v0.x, self.v0.y, v.x, v.y)  # Create new temp line
 
     def close(self, v):
+        self.v1 = v
         self.canvas.delete(self.id)
         self.id = None
-        self.canvas.create_rectangle(self.v0.x, self.v0.y, v.x, v.y)
+        self.canvas.create_rectangle(self.v0.x, self.v0.y, self.v1.x, self.v1.y)
 
-    def snap_more(self, v):
+    def snap_more_disabled(self, v):
         """Overrides Temp.snap_more
         :param v: v is an referenced object which may well have it's contents altered.
         """

@@ -80,10 +80,10 @@ class Model():
         except IOError:
             print("Error could not save %s" % file.name)
 
-    def snap(self, v, d):
+    def snap(self, clicks, v, d):
         """A pass through method to avoid Controller calling graph.snap directly.
         :param v: Vector2
         :param d: Distance allowed around v
         :return: Either None for no snap or a Marker object if a snap detected
         """
-        return self.graph.snap(v, d)
+        return self.graph.snap(clicks, v, d)
