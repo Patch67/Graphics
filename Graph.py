@@ -8,7 +8,7 @@ Patrick Biggs
 """
 
 import abc
-from Vectors import Vector2, Vector2Pair
+from Vectors import Vector2
 from Snap import Snap, EndPoint, MidPoint, Centre, VerticalInline, HorizontalInline, Horizontal, Vertical, Square
 import operator
 from math import sqrt
@@ -24,23 +24,17 @@ class Graph:
     @abc.abstractmethod
     def snap(self, v, d):
         """Search for coordinates within d - distance or v - Vector, i.e. Mouse click"""
-        # TODO: All snaps should be done in overrides of this and the best result returned.
-        '''
-         Instead of just passing in the current mouse press we should also pass in the previous
-         so we can check for horizontal and vertical alignment too.
-         In the case of poly line we could check for end and mid point snaps on the construction lines too.
-        '''
         pass
 
     def get_endpoint(self, v, d):
         result = None
         snaps = []
         d2 = d*d
-        distance = Vector2Pair(self.v0, v).dist2()
+        distance = self.v0.dist2(v)
         if distance < d2:
             snaps.append(Snap(self.v0, distance))
 
-        distance = Vector2Pair(self.v1, v).dist2()
+        distance = self.v1.dist(v)
         if distance < d2:
             snaps.append(Snap(self.v1, distance))
 
@@ -66,16 +60,17 @@ class Line(Graph):
         d2 = d * d  # d is distance squared
 
         '''Check the two end points'''
-        distance = Vector2Pair(self.v0, v).dist2()
+        distance = self.v0.dist2(v)
         if distance < d2:
             snaps.append(EndPoint(self.v0, distance))
-        distance = Vector2Pair(self.v1, v).dist2()
+
+        distance = self.v1.dist2(v)
         if distance < d2:
             snaps.append(EndPoint(self.v1, distance))
 
         '''Check the middle point'''
-        mid = Vector2Pair(self.v0, self.v1).mid()
-        distance = Vector2Pair(mid, v).dist2()
+        mid = self.v0.mid(self.v1)
+        distance = mid.dist2(v)
         if distance < d2:
             snaps.append(MidPoint(mid, distance))
 
@@ -125,9 +120,9 @@ class Circle(Graph):
 
     def snap(self, clicks, v, d):
         result = None
-        centre = Vector2Pair(self.v0, self.v1).mid()
+        centre = self.v0.mid(self.v1)
         d2 = d * d
-        distance = Vector2Pair(centre, v).dist2()
+        distance = centre.dist2(v)
         if distance < d2:
             result = Centre(centre, distance)
         return result  # If there is one
@@ -145,44 +140,42 @@ class Rectangle(Graph):
         snaps = []
         d2 = d * d  # Squares are quicker than sqrt
         '''Check the four corners for endpoints'''
-        distance = Vector2Pair(self.v0, v).dist2()
+        distance = self.v0.dist2(v)
         if distance < d2:
             snaps.append(EndPoint(self.v0, distance))
 
         va = Vector2(self.v1.x, self.v0.y)
-        distance = Vector2Pair(va, v).dist2()
+        distance = va.dist2(v)
         if distance < d2:
             snaps.append(EndPoint(va, distance))
 
-        distance = Vector2Pair(self.v1, v).dist2()
+        distance = self.v1.dist2(v)
         if distance < d2:
             snaps.append(EndPoint(self.v1, distance))
 
         vb = Vector2(self.v0.x, self.v1.y)
-        distance = Vector2Pair(vb, v).dist2()
+        distance = vb.dist2(v)
         if distance < d2:
             snaps.append(EndPoint(vb, distance))
 
-
-
         '''Check the four mid points'''
-        mid = Vector2Pair(self.v0, va).mid()
-        distance = Vector2Pair(mid, v).dist2()
+        mid = self.v0.mid(va)
+        distance = mid.dist2(v)
         if distance < d2:
             snaps.append(MidPoint(mid, distance))
 
-        mid = Vector2Pair(va, self.v1).mid()
-        distance = Vector2Pair(mid, v).dist2()
+        mid = va.mid(self.v1)
+        distance = mid.dist2(v)
         if distance < d2:
             snaps.append(MidPoint(mid, distance))
 
-        mid = Vector2Pair(self.v1, vb).mid()
-        distance = Vector2Pair(mid, v).dist2()
+        mid = self.v1.mid(vb)
+        distance = mid.dist2(v)
         if distance < d2:
             snaps.append(MidPoint(mid, distance))
 
-        mid = Vector2Pair(vb, self.v0).mid()
-        distance = Vector2Pair(mid, v).dist2()
+        mid = vb.mid(self.v0)
+        distance = mid.dist2(v)
         if distance < d2:
             snaps.append(MidPoint(mid, distance))
 
@@ -191,9 +184,9 @@ class Rectangle(Graph):
             width = abs(self.v0.x - v.x)
             height = abs(self.v0.y - v.y)
             distance = abs(width - height)
-            if distance < 10:
+            if distance < sqrt(d):
                 ave = (width + height) / 2
-                self.v1 = v  # Just to initiate a Vector2 variable
+                self.v1 = Vector2(0,0)  # Just to initiate a Vector2 variable
                 if self.v0.x < v.x:
                     self.v1.x = self.v0.x + ave
                 else:
@@ -231,18 +224,29 @@ class Pline(Graph):
         self.close = close
 
     def snap(self, clicks, v, d):
+        result = None
+        snaps = []
         d2 = d*d
         for node in self.nodes:  # Run through every node for an end point match
-            if Vector2Pair(v, node).dist2() < d2:
-                return ["End", node]  # If the snap result is a class then we won't have to do loads of if's later
+            distance = v.dist2(node)
+            if distance < d2:
+                snaps.append(EndPoint(node, distance))
         for i in range(0,len(self.nodes)-1):  # Run through every line for an mid point match
-            mid = Vector2Pair(self.nodes[i], self.nodes[i+1]).mid()
-            if Vector2Pair(v, mid).dist2() < d2:
-                return ["Mid", mid]
+            mid = self.nodes[i].mid(self.nodes[i+1])
+            distance = v.dist2(mid)
+            if distance < d2:
+                snaps.append(MidPoint(mid, distance))
         if self.close:
-            mid = Vector2Pair(self.nodes[0], self.nodes[-1]).mid()  # Check mid point between first and last nodes
-            if Vector2Pair(v, mid).dist2() < d2:
-                return ["Mid", mid]
+            mid = self.nodes[0].mid(self.nodes[-1])  # Check mid point between first and last nodes
+            distance = v.dist2(mid)
+            if distance < d2:
+                snaps.append(MidPoint(mid, distance))
+
+        '''Find the closest marker'''
+        snaps.sort(key=operator.attrgetter('distance'))
+        if len(snaps) > 0:
+            result = snaps[0]
+        return result # If there is one
 
 class Group(Graph):
     """ Concrete class for graphics group

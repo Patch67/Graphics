@@ -19,8 +19,8 @@ class Controller:
         self.set_title()  # Call set title because __name & __filename have been changed without setters
         self.stateTools = True
         self.mode = "SELECT"
-        self.x = 0  # Previous click coordinates
-        self.y = 0  # Previous click coordinates
+        #self.x = 0  # Previous click coordinates
+        #self.y = 0  # Previous click coordinates
         self.clicks = []  # A list of clicks, not just one.
         self.view.run()  # Start the GUI
 
@@ -127,7 +127,7 @@ class Controller:
                 print("Line Horizontal")
             elif isinstance(hit, Vertical):
                 print("Line Vertical")
-        if len(self.clicks) > 0:  # if there is a graphics operation in progress
+        if self.view.temp:  # if there is a graphics operation in progress
             self.view.temp.mouse_move(v)  # tell the graphics operation about the mouse move
 
     def cmd_left_click(self, mx, my):
@@ -164,11 +164,8 @@ class Controller:
                 self.clicks = []
             elif self.mode == "RECTANGLE":
                 self.view.temp.close(v)
-                print("Temp %d, %d, %d, %d" % (self.view.temp.v0.x, self.view.temp.v0.y, self.view.temp.v1.x, self.view.temp.v1.y))
                 self.view.temp = None
                 self.model.add_rectangle(self.clicks)
-                for click in self.clicks:
-                    print("Click %d, %d" % (click.x, click.y))
                 self.clicks = []
             elif self.mode == "PLINE":
                 self.view.temp.add_node(v)

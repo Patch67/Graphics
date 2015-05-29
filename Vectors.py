@@ -20,24 +20,13 @@ class Vector2:
         """Returns anti-clockwise angle between vector and the x axis, in radians"""
         return atan(self.x / self.y)
 
-
-class Vector2Pair:
-    """Class for operations on pairs of 2 dimensional vectors"""
-    # TODO: Eliminate this class.  They should be part of Vector2 with a vector as parameter
-    def __init__(self, v0, v1):
-        self.v0, self.v1 = v0, v1
-
-    def dist2(self):
-        """Finds the distance squared between two points.
-        It is faster to compare squared numbers than to computer square root"""
-        dx = abs(self.v1.x - self.v0.x)
-        dy = abs(self.v1.y - self.v0.y)
+    def dist2(self,v):
+        dx = self.x - v.x
+        dy = self.y - v.y
         return dx*dx + dy*dy
 
-    def mid(self):
-        """Finds the mid point between two points"""
-        mx = int(self.v0.x + (self.v1.x - self.v0.x) / 2)  # middle x
-        my = int(self.v0.y + (self.v1.y - self.v0.y) / 2)  # middle y
+    def mid(self, v):
+        mx = int(self.x + (v.x - self.x)/2)
+        my = int(self.y + (v.y - self.y)/2)
         return Vector2(mx, my)
-
 
