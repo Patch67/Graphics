@@ -30,3 +30,11 @@ class Vector2:
         my = int(self.y + (v.y - self.y)/2)
         return Vector2(mx, my)
 
+    def near(self, v, d):
+        """True if v is within distance d of self"""
+        d2 = d*d
+        if self.dist(v) < d2:
+            result = True
+        else:
+            result = False
+        return result

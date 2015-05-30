@@ -11,7 +11,6 @@ class Controller:
     """The business logic of the application."""
 
     def __init__(self, name):
-        """Constructor"""
         self.model = Model(self)
         self.view = View(self)
         self.__name = name
@@ -19,8 +18,6 @@ class Controller:
         self.set_title()  # Call set title because __name & __filename have been changed without setters
         self.stateTools = True
         self.mode = "SELECT"
-        #self.x = 0  # Previous click coordinates
-        #self.y = 0  # Previous click coordinates
         self.clicks = []  # A list of clicks, not just one.
         self.view.run()  # Start the GUI
 
@@ -55,6 +52,7 @@ class Controller:
             self.cmd_save()
         self.model = Model(self)
         self.filename = ""
+        self.clicks = []
         self.view.clear()
 
     def cmd_open(self):
@@ -66,6 +64,7 @@ class Controller:
         filename = self.view.open_file_dialog()
         if filename != "":  # if user does not press Cancel in response to open file dialog
             self.filename = filename
+            self.clicks = []
             file = open(filename, mode="rb")
             self.model.load(file)
             self.view.make_group(self.model.graph)
@@ -169,8 +168,6 @@ class Controller:
                 self.clicks = []
             elif self.mode == "PLINE":
                 self.view.temp.add_node(v)
-        #self.x = v.x
-        #self.y = v.y
 
     def cmd_right_click(self, x, y):
         """Show context menu. This depends on the mode we are in"""

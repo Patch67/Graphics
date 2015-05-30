@@ -15,7 +15,6 @@ class Temp:
     @abc.abstractmethod
     def __init__(self, view, v):
         self.canvas = view.canvas
-        #self.model = None  # controller.model
         self.v0 = v
         self.v1 = None
         self.id = None  # Reference to construction object
@@ -27,18 +26,12 @@ class Temp:
 
     @abc.abstractmethod
     def close(self):
-        """Kills the temporary construction and creates the finished article"""
+        """Kill the temporary construction object (self.id) and creates the finished article"""
         pass
 
     def escape(self):
         """Abandons the construction of a graphics object"""
         self.canvas.delete(self.id)
-
-    def snap_more(self, v):
-        """Check for other snaps for this graphics type, such as horizontal, vertical, square, in-line, etc.
-        :param v: Coordinates passed in and out
-        """
-        return ["None", v]
 
 
 class TempLine(Temp):
@@ -58,16 +51,6 @@ class TempLine(Temp):
         self.id = None
         self.canvas.create_line(self.v0.x, self.v0.y, v.x, v.y)
 
-    def snap_more_disabled(self, v):
-        """Overrides Temp.snap_more
-        :param v: v is an referenced object which may well have it's contents altered.
-        """
-        if abs(self.v0.x - v.x) < 10:  # Near vertical
-            v.x = self.v0.x
-        elif abs(self.v0.y - v.y) < 10:  # Near horizontal
-            v.y = self.v0.y
-        return ["Vert", v]
-
 
 class TempRectangle(Temp):
     """Class for the construction of a rectangle"""
@@ -85,28 +68,6 @@ class TempRectangle(Temp):
         self.canvas.delete(self.id)
         self.id = None
         self.canvas.create_rectangle(self.v0.x, self.v0.y, self.v1.x, self.v1.y)
-
-    def snap_more_disabled(self, v):
-        """Overrides Temp.snap_more
-        :param v: v is an referenced object which may well have it's contents altered.
-        """
-        '''Check if nearly square'''
-        width = abs(self.v0.x - v.x)
-        height = abs(self.v0.y - v.y)
-        if abs(width - height) < 10:
-            ave = (width + height) / 2
-            self.v1 = v  # Just to initiate a Vector2 variable
-            if self.v0.x < v.x:
-                self.v1.x = self.v0.x + ave
-            else:
-                self.v1.x = self.v0.x - ave
-            if self.v0.y < v.y:
-                self.v1.y = self.v0.y + ave
-            else:
-                self.v1.y = self.v0.y - ave
-            return ["Sqr",self.v0, self.v1]
-        else:
-            return ["None", v]
 
 
 class TempCircle(Temp):
@@ -168,8 +129,12 @@ class TempPline(Temp):
         """Kill the temporary construction line and create the finished item"""
         self.canvas.delete(self.id)
         self.id = None
-        for i in range(len(self.nodes)-1):
-            self.canvas.create_line(self.nodes[i].x, self.nodes[i].y, self.nodes[i+1].x, self.nodes[i+1].y)
+        """TODO: This does not seem right.
+        We've just deleted one line but are creating multiple lines.
+        Shouldn't I just recreate the last line?
+        """
+        #for i in range(len(self.nodes)-1):  # Exclude the last node
+        self.canvas.create_line(self.nodes[-2].x, self.nodes[-2].y, self.nodes[-1].x, self.nodes[-1].y)
         if close:
             self.canvas.create_line(self.nodes[0].x, self.nodes[0].y, self.nodes[-1].x, self.nodes[-1].y)
         self.nodes = []

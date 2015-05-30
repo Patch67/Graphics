@@ -9,9 +9,9 @@ Patrick Biggs
 
 import abc
 from Vectors import Vector2
-from Snap import EndPoint, MidPoint, Centre, VerticalInline, HorizontalInline, Horizontal, Vertical
+from Snap import EndPoint, MidPoint, Centre, VerticalInline, HorizontalInline, Horizontal, Vertical, Square
 import operator
-from math import sqrt
+#from math import sqrt # POSTPONED UNTIL VERSION 0.2
 
 class Graph:
     """ Abstract base class from which all graphics object derive"""
@@ -62,6 +62,10 @@ class Line(Graph):
             result = snaps[0]
         else:
             '''Check for line ups'''
+            """TODO: Thee could be a situation where a mouse is near to a horizontal and a vertical inline.
+            This might mean making a DualInline marker or it could mean returning multiple snaps instead of just one
+            """
+            """POSTPONED UNTIL VERSION 0.2
             d = sqrt(d)
             if abs(self.v0.x - v.x) < d:
                 v.x = self.v0.x
@@ -75,21 +79,10 @@ class Line(Graph):
             if abs(self.v1.y - v.y) < d:
                 v.y = self.v1.y
                 snaps.append(HorizontalInline(v, self.v1, d))
-
+            """
             if len(snaps) > 0:
                 snaps.sort(key=operator.attrgetter('distance'))
                 result = snaps[0]
-            else:
-                '''More Snaps - vertical and horizontal'''
-                if len(clicks) > 0:  # if not first click
-                    if abs(self.v0.x - v.x) < 10:  # Near vertical
-                        v.x = self.v0.x
-                        result = Vertical(self.v0, v, distance)
-                    if abs(self.v0.y - v.y) < 10:  # Near horizontal
-                        v.y = self.v0.y
-                        result = Horizontal(self.v0, v, distance)
-                    # TODO: Could add Square snap here to snap to 45 degree increments
-
         return result  # If there is one
 
 
@@ -102,12 +95,39 @@ class Circle(Graph):
 
     def snap(self, clicks, v, d):
         result = None
+        '''Check for centre point'''
         centre = self.v0.mid(self.v1)
         d2 = d * d
         distance = centre.dist2(v)
         if distance < d2:
             result = Centre(centre, distance)
+        else:
+            '''Check for quadrants - N, E, S & W'''
+            NW = self.v0
+            SE = self.v1
+            NE = Vector2(SE.x, NW.y)
+            SW = Vector2(NW.x, SE.y)
+            N = NW.mid(NE)
+            E = NE.mid(SE)
+            S = SE.mid(SW)
+            W = SW.mid(NW)
+            distance = N.dist2(v)
+            if distance < d2:
+                result = MidPoint(N, distance)
+            else:
+                distance = E.dist2(v)
+                if distance < d2:
+                    result = MidPoint(E, distance)
+                else:
+                    distance = S.dist2(v)
+                    if distance < d2:
+                        result = MidPoint(S, distance)
+                    else:
+                        distance = W.dist2(v)
+                        if distance < d2:
+                            result = MidPoint(W, distance)
         return result  # If there is one
+
 
 
 class Rectangle(Graph):
@@ -161,26 +181,6 @@ class Rectangle(Graph):
         if distance < d2:
             snaps.append(MidPoint(mid, distance))
 
-        '''Check for near Square'''
-        """
-        '''Commented out due to bug'''
-        if len(clicks) > 0:
-            width = abs(self.v0.x - v.x)
-            height = abs(self.v0.y - v.y)
-            distance = abs(width - height)
-            if distance < sqrt(d):
-                ave = (width + height) / 2
-                self.v1 = Vector2(0,0)  # Just to initiate a Vector2 variable
-                if self.v0.x < v.x:
-                    self.v1.x = self.v0.x + ave
-                else:
-                    self.v1.x = self.v0.x - ave
-                if self.v0.y < v.y:
-                    self.v1.y = self.v0.y + ave
-                else:
-                    self.v1.y = self.v0.y - ave
-                snaps.append(Square(self.v0, self.v1, distance))
-        """
         '''Find the closest marker'''
         if len(snaps) > 0:
             snaps.sort(key=operator.attrgetter('distance'))
@@ -250,6 +250,10 @@ class Group(Graph):
             if snap:  # if there is a find
                 snaps.append(snap)
         '''Find the closest snaps'''
+        """TODO:  There could be a situation with inline snaps where multiple matches are made,
+        i.e. with a horizontal snap from one object and a vertical snap from another.
+        At present the code does not allow for this.
+        Perhaps inline matches should be treated differently from simple one point snaps, perhaps they should be object guides"""
         if len(snaps) > 0:
             snaps.sort(key=operator.attrgetter('distance'))
             result = snaps[0]

@@ -22,8 +22,8 @@ class View:
         self.tool_bar = None  # Holder for tool bar to come later
         self.marker_list = []  # List of marker objects as the result of a snap find
         self.temp = None  # This is for a Temp object when drawing a graphics object is under construction
-        self.context = None
-        self.pline = None
+        self.context = None  # Reference to context menu
+        self.pline = None  # Reference to pline context menu
 
         self.create_menus()
         self.create_context_menus()
@@ -285,7 +285,7 @@ class View:
         self.temp = None  # Clear the temp object.
 
     def make_pline(self, pline):
-        """Add a new, permanent, line to canvas"""
+        """Add a new, permanent, pline to canvas"""
         start = pline.nodes.pop(0)
         temp = start
         for node in pline.nodes:
@@ -311,6 +311,7 @@ class View:
 
     def clear(self):
         self.canvas.delete("all")
+        self.temp = None
 
     """
     Set up temporary construction objects
