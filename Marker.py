@@ -36,7 +36,7 @@ class CentreMarker(Marker):
     """Marks a little red circle at the centre"""
     def __init__(self, view, v0):
         super(CentreMarker, self).__init__(view, v0)
-        self.view.marker_list.append(self.view.canvas.create_oval(self.v0.x - 5, self.v0.y - 5, self.v0.x + 5, self.v0.y + 5, fill=self.colour))
+        self.view.marker_list.append(self.view.canvas.create_oval(self.v0.x - 5, self.v0.y - 5, self.v0.x + 5, self.v0.y + 5, outline=self.colour))
 
 
 class InlineMarker(Marker):

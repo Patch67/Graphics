@@ -169,8 +169,8 @@ class Controller:
                 self.clicks = []
             elif self.mode == "PLINE":
                 self.view.temp.add_node(v)
-        self.x = v.x
-        self.y = v.y
+        #self.x = v.x
+        #self.y = v.y
 
     def cmd_right_click(self, x, y):
         """Show context menu. This depends on the mode we are in"""

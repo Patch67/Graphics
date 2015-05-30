@@ -9,7 +9,7 @@ Patrick Biggs
 
 import abc
 from Vectors import Vector2
-from Snap import Snap, EndPoint, MidPoint, Centre, VerticalInline, HorizontalInline, Horizontal, Vertical, Square
+from Snap import EndPoint, MidPoint, Centre, VerticalInline, HorizontalInline, Horizontal, Vertical
 import operator
 from math import sqrt
 
@@ -25,24 +25,6 @@ class Graph:
     def snap(self, v, d):
         """Search for coordinates within d - distance or v - Vector, i.e. Mouse click"""
         pass
-
-    def get_endpoint(self, v, d):
-        result = None
-        snaps = []
-        d2 = d*d
-        distance = self.v0.dist2(v)
-        if distance < d2:
-            snaps.append(Snap(self.v0, distance))
-
-        distance = self.v1.dist(v)
-        if distance < d2:
-            snaps.append(Snap(self.v1, distance))
-
-        snaps.sort()
-        if len(snaps) > 0:
-            result = snaps[0]
-        return result
-
 
 class Line(Graph):
     """ Concrete class for graphics lines"""
@@ -75,7 +57,7 @@ class Line(Graph):
             snaps.append(MidPoint(mid, distance))
 
         '''find the nearest marker'''
-        snaps.sort()
+        snaps.sort(key=operator.attrgetter('distance'))
         if len(snaps) > 0:
             result = snaps[0]
         else:
@@ -94,11 +76,11 @@ class Line(Graph):
                 v.y = self.v1.y
                 snaps.append(HorizontalInline(v, self.v1, d))
 
-            snaps.sort(key=operator.attrgetter('distance'))
             if len(snaps) > 0:
+                snaps.sort(key=operator.attrgetter('distance'))
                 result = snaps[0]
             else:
-                '''More Snaps - previously in temp.snap'''
+                '''More Snaps - vertical and horizontal'''
                 if len(clicks) > 0:  # if not first click
                     if abs(self.v0.x - v.x) < 10:  # Near vertical
                         v.x = self.v0.x
@@ -180,6 +162,8 @@ class Rectangle(Graph):
             snaps.append(MidPoint(mid, distance))
 
         '''Check for near Square'''
+        """
+        '''Commented out due to bug'''
         if len(clicks) > 0:
             width = abs(self.v0.x - v.x)
             height = abs(self.v0.y - v.y)
@@ -196,10 +180,10 @@ class Rectangle(Graph):
                 else:
                     self.v1.y = self.v0.y - ave
                 snaps.append(Square(self.v0, self.v1, distance))
-
+        """
         '''Find the closest marker'''
-        snaps.sort(key=operator.attrgetter('distance'))
         if len(snaps) > 0:
+            snaps.sort(key=operator.attrgetter('distance'))
             result = snaps[0]
         return result # If there is one
 
@@ -212,10 +196,6 @@ class Text(Graph):
     def __init__(self, v0, text):
         self.v0 = v0
         self.text = text
-
-    def snap(self, clicks, v, d):
-        # TODO: Add code for Text pick
-        return None
 
 
 class Pline(Graph):
@@ -231,7 +211,7 @@ class Pline(Graph):
             distance = v.dist2(node)
             if distance < d2:
                 snaps.append(EndPoint(node, distance))
-        for i in range(0,len(self.nodes)-1):  # Run through every line for an mid point match
+        for i in range(0,len(self.nodes)-1):  # Run through every line for a mid point match
             mid = self.nodes[i].mid(self.nodes[i+1])
             distance = v.dist2(mid)
             if distance < d2:
@@ -243,8 +223,8 @@ class Pline(Graph):
                 snaps.append(MidPoint(mid, distance))
 
         '''Find the closest marker'''
-        snaps.sort(key=operator.attrgetter('distance'))
         if len(snaps) > 0:
+            snaps.sort(key=operator.attrgetter('distance'))
             result = snaps[0]
         return result # If there is one
 
@@ -262,6 +242,7 @@ class Group(Graph):
         self.children.append(graph)
 
     def snap(self, clicks, v, d):
+        result = None
         snaps = []
         '''Go through each graphics object looking for snaps'''
         for child in self.children:
@@ -269,9 +250,7 @@ class Group(Graph):
             if snap:  # if there is a find
                 snaps.append(snap)
         '''Find the closest snaps'''
-        snaps.sort(key=operator.attrgetter('distance'))
         if len(snaps) > 0:
+            snaps.sort(key=operator.attrgetter('distance'))
             result = snaps[0]
-        else:
-            result = None
         return result

@@ -44,7 +44,7 @@ class Model():
         self.dirty = True
 
     def add_poly_line(self, nodes, close):
-        self.graph.add(Pline( nodes, close))
+        self.graph.add(Pline(nodes, close))
         self.dirty = True
 
     def add_polygon(self):
