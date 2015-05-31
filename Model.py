@@ -1,4 +1,4 @@
-from Graph import Group, Line, Rectangle, Circle, Pline
+from Graph import Group, Line, Rectangle, Circle, Oval, Pline
 import pickle
 
 
@@ -40,7 +40,10 @@ class Model():
         self.dirty = True
 
     def add_circle(self, nodes):
-        self.graph.add(Circle(nodes[0], nodes[1]))
+        self.graph.add(Circle(nodes[0], nodes[0].distance(nodes[1])))
+
+    def add_oval(self, nodes):
+        self.graph.add(Oval(nodes[0], nodes[1]))
         self.dirty = True
 
     def add_poly_line(self, nodes, close):
@@ -87,3 +90,6 @@ class Model():
         :return: Either None for no snap or a Marker object if a snap detected
         """
         return self.graph.snap(clicks, v, d)
+
+    def pick(self, v, d):
+        return self.graph.pick(v, d)

@@ -1,8 +1,8 @@
 from tkinter import Tk, filedialog, Canvas, Menu, Frame, BOTH, YES, RAISED, Button, TOP, LEFT, Y, messagebox,\
     IntVar, Checkbutton
-from PIL import Image, ImageTk
-from Temp import TempLine, TempCircle, TempRectangle, TempPline
-
+#from PIL import Image, ImageTk
+from Temp import TempLine, TempOval, TempRectangle, TempPline, TempCircle
+from Vectors import Vector2
 
 class View:
     """Everything to do with the View from MVC.
@@ -28,7 +28,6 @@ class View:
         self.create_menus()
         self.create_context_menus()
         self.create_pline_menu()
-        self.create_toolbar()
 
         self.canvas.pack(fill=BOTH, expand=YES)
         self.canvas.focus_set()
@@ -79,9 +78,10 @@ class View:
 
         # drawing menus
         drawing_menu = Menu(menu_bar, tearoff=0)
-        drawing_menu.add_command(label="Select", command=self.control.cmd_null)
+        drawing_menu.add_command(label="Select", command=self.control.cmd_select)
         drawing_menu.add_command(label="Line", command=self.control.cmd_line)
         drawing_menu.add_command(label="Rectangle", command=self.control.cmd_rectangle)
+        drawing_menu.add_command(label="Oval", command=self.control.cmd_oval)
         drawing_menu.add_command(label="Circle", command=self.control.cmd_circle)
         drawing_menu.add_command(label="Pline", command=self.control.cmd_pline)
         drawing_menu.add_command(label="Group", command=self.control.cmd_null)
@@ -115,8 +115,6 @@ class View:
 
         self.master.config(menu=menu_bar)  # lock in menu_bar
 
-
-
     def create_context_menus(self):
         """Creates the connects menus, i.e. for right click"""
         self.context = Menu(self.master, tearoff=0)
@@ -129,29 +127,6 @@ class View:
         self.pline.add_command(label="Close", command=self.control.cmd_pline_close)
         self.pline.add_command(label="End", command=self.control.cmd_pline_end)
 
-    def create_toolbar(self):
-        """Creates toolbar"""
-        # TODO: Make this a floating, dockable tool bar with a menu option to show / hide
-        # TODO: Make config file to save current status, Floating, Hidden, Dock_top, dock_bottom, dock_left, dock_right
-        self.tool_bar = Frame(self.master, bd=1, relief=RAISED)
-
-        self.img = Image.open("exit.png")
-        eimg = ImageTk.PhotoImage(self.img)  
-
-        exit_button = Button(self.tool_bar, image=eimg, bd=1, relief=RAISED, command=self.control.cmd_exit)
-        exit_button.image = eimg
-        exit_button.pack(side=TOP, padx=2, pady=2)
-
-        another_button = Button(self.tool_bar, image=eimg, bd=1, relief=RAISED, command=self.control.cmd_null)
-        another_button.image = eimg
-        another_button.pack(side=TOP, padx=2, pady=2)
-
-        another_button = Button(self.tool_bar, image=eimg, bd=1, relief=RAISED, command=self.control.cmd_null)
-        another_button.image = eimg
-        another_button.pack(side=TOP, padx=2, pady=2)
-
-        self.tool_bar.pack(side=LEFT, fill=Y)
-        
     def create_events(self):
         """Binds keyboard events to handlers"""
         self.canvas.bind("<Control-o>", self.key_open)
@@ -241,18 +216,10 @@ class View:
         self.pline.tk_popup(x, y, 0)
 
     def show_toolbar(self):
-        # TODO: Make this tool bar open in the right place every time, not just the first time
-        self.create_menus()
-        self.create_context_menus()
-        self.create_toolbar()
-        self.create_toolbar()
-        self.create_toolbar()
-        self.canvas.pack(fill=BOTH, expand=YES)
-        self.canvas.focus_set()
-        self.create_events()
+        pass
 
     def hide_toolbar(self):
-        self.tool_bar.pack_forget()
+        pass
 
     """
     View methods to draw Graph objects
@@ -269,22 +236,31 @@ class View:
         for marker_id in self.marker_list:
             self.canvas.delete(marker_id)
 
-    def make_line(self, line):
+    def draw_line(self, line):
         """Add a new, permanent, line to canvas"""
-        self.canvas.create_line(line.v0.x, line.v0.y, line.v1.x, line.v1.y, fill="#476042")
+        self.canvas.create_line(line.v0.x, line.v0.y, line.v1.x, line.v1.y)
         self.temp = None  # Clear the temp object.
 
-    def make_circle(self, circle):
+    def draw_oval(self, oval):
+        """Add a new, permanent, oval to canvas"""
+
+        self.canvas.create_oval(oval.v0.x, oval.v0.y, oval.v1.x, oval.v1.y)
+        self.temp = None  # Clear the temp object.
+
+    def draw_circle(self, circle):
         """Add a new, permanent, circle to canvas"""
-        self.canvas.create_oval(circle.v0.x, circle.v0.y, circle.v1.x, circle.v1.y)
+
+        lo = Vector2(circle.centre.x - circle.radius, circle.centre.y - circle.radius)
+        hi = Vector2(circle.centre.x + circle.radius, circle.centre.y + circle.radius)
+        self.canvas.create_oval(lo.x, lo.y, hi.x, hi.y)  # Create new temp line
         self.temp = None  # Clear the temp object.
 
-    def make_rectangle(self, rectangle):
+    def draw_rectangle(self, rectangle):
         """Add a new, permanent, rectangle to canvas"""
         self.canvas.create_rectangle(rectangle.v0.x, rectangle.v0.y, rectangle.v1.x, rectangle.v1.y)
         self.temp = None  # Clear the temp object.
 
-    def make_pline(self, pline):
+    def draw_pline(self, pline):
         """Add a new, permanent, pline to canvas"""
         start = pline.nodes.pop(0)
         temp = start
@@ -295,18 +271,20 @@ class View:
             self.canvas.create_line(node.x, node.y, start.x, start.y)
         self.temp = None  # Clear the temp object.
 
-    def make_group(self, group):
+    def draw_group(self, group):
         self.clear()
         for child in group.children:
             t = type(child).__name__
             if t == "Line":
-                self.make_line(child)
+                self.draw_line(child)
+            elif t == "Oval":
+                self.draw_oval(child)
             elif t == "Circle":
-                self.make_circle(child)
+                self.draw_circle(child)
             elif t == "Rectangle":
-                self.make_rectangle(child)
+                self.draw_rectangle(child)
             elif t == "Pline":
-                self.make_pline(child)
+                self.draw_pline(child)
         self.temp = None  # Clear the temp object.
 
     def clear(self):
@@ -324,6 +302,9 @@ class View:
 
     def add_temp_rectangle(self, v):
         self.temp = TempRectangle(self, v)
+
+    def add_temp_oval(self,v):
+        self.temp = TempOval(self, v)
 
     def add_temp_circle(self,v):
         self.temp = TempCircle(self, v)

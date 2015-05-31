@@ -70,10 +70,10 @@ class TempRectangle(Temp):
         self.canvas.create_rectangle(self.v0.x, self.v0.y, self.v1.x, self.v1.y)
 
 
-class TempCircle(Temp):
+class TempOval(Temp):
     """Class for the construction of a circle"""
     def __init__(self, view, v):
-        super(TempCircle, self).__init__(view, v)
+        super(TempOval, self).__init__(view, v)
 
     def mouse_move(self, v):
         # erase old line, if it exists else draw new line
@@ -84,7 +84,7 @@ class TempCircle(Temp):
     def close(self, v):
         self.canvas.delete(self.id)
         self.id = None
-        self.canvas.create_oval(self.v0.x, self.v0.y, v.x, v.y)
+        self.canvas.create_oval(self.v0.x, self.v0.y, v.x, v.y, fill="#476042")
 
     def snap_more(self, v):
         """Overrides Temp.snap_more
@@ -107,6 +107,30 @@ class TempCircle(Temp):
             return ["Sqr",self.v0, self.v1]
         else:
             return ["None", v]
+
+
+class TempCircle(Temp):
+    """Class for the construction of a circle"""
+    def __init__(self, view, v):
+        super(TempCircle, self).__init__(view, v)
+
+    def mouse_move(self, v):
+        # erase old line, if it exists else draw new line
+        if self.id:
+            self.canvas.delete(self.id)
+        radius = self.v0.distance(v)
+        lo = Vector2(self.v0.x - radius, self.v0.y - radius)
+        hi = Vector2(self.v0.x + radius, self.v0.y + radius)
+        self.id = self.canvas.create_oval(lo.x, lo.y, hi.x, hi.y)  # Create new temp line
+
+    def close(self, v):
+        self.canvas.delete(self.id)
+        self.id = None
+        radius = self.v0.distance(v)
+        lo = Vector2(self.v0.x - radius, self.v0.y - radius)
+        hi = Vector2(self.v0.x + radius, self.v0.y + radius)
+        self.id = self.canvas.create_oval(lo.x, lo.y, hi.x, hi.y)  # Create new temp line
+
 
 
 class TempPline(Temp):

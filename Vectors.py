@@ -20,10 +20,17 @@ class Vector2:
         """Returns anti-clockwise angle between vector and the x axis, in radians"""
         return atan(self.x / self.y)
 
-    def dist2(self,v):
+    def dist2(self, v):
+        """Returns distance squared between self and v.
+        Note: This is faster than completing a full square root"""
         dx = self.x - v.x
         dy = self.y - v.y
         return dx*dx + dy*dy
+
+    def distance(self, v):
+        """The true distance between self and v.
+        Unlike dist2 this does use sqrt and does return the true distance"""
+        return sqrt(self.dist2(v))
 
     def mid(self, v):
         mx = int(self.x + (v.x - self.x)/2)

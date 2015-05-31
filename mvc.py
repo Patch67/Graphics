@@ -67,7 +67,7 @@ class Controller:
             self.clicks = []
             file = open(filename, mode="rb")
             self.model.load(file)
-            self.view.make_group(self.model.graph)
+            self.view.draw_group(self.model.graph)
             file.close()
 
     def cmd_save(self):
@@ -107,67 +107,80 @@ class Controller:
 
     def mouse_move(self, x, y):
         """Control mouse move events"""
-        '''See if mouse snaps to anything'''
-        self.view.erase_markers()
         v = Vector2(x,y)
-        hit = self.model.snap(self.clicks, v, 20)
-        if hit:
-            if isinstance(hit, EndPoint):
-                self.view.marker_list.append(EndPointMarker(self.view, hit.v))
-            elif isinstance(hit, MidPoint):
-                self.view.marker_list.append(MidPointMarker(self.view, hit.v))
-            elif isinstance(hit, VerticalInline) or isinstance(hit, HorizontalInline):
-                self.view.marker_list.append(InlineMarker(self.view, hit.v, hit.v1))
-            elif isinstance(hit, Centre):
-                self.view.marker_list.append(CentreMarker(self.view, hit.v))
-            elif isinstance(hit, Square):
-                self.view.marker_list.append(SquareMarker(self.view, hit.v, hit.v1))  # Note 2 coordinates here
-            elif isinstance(hit, Horizontal):
-                print("Line Horizontal")
-            elif isinstance(hit, Vertical):
-                print("Line Vertical")
-        if self.view.temp:  # if there is a graphics operation in progress
-            self.view.temp.mouse_move(v)  # tell the graphics operation about the mouse move
+        if self.mode == "SELECT":
+            pass
+        else:
+            '''See if mouse snaps to anything'''
+            self.view.erase_markers()
+            hit = self.model.snap(self.clicks, v, 20)
+            if hit:
+                if isinstance(hit, EndPoint):
+                    self.view.marker_list.append(EndPointMarker(self.view, hit.v))
+                elif isinstance(hit, MidPoint):
+                    self.view.marker_list.append(MidPointMarker(self.view, hit.v))
+                elif isinstance(hit, VerticalInline) or isinstance(hit, HorizontalInline):
+                    self.view.marker_list.append(InlineMarker(self.view, hit.v, hit.v1))
+                elif isinstance(hit, Centre):
+                    self.view.marker_list.append(CentreMarker(self.view, hit.v))
+                elif isinstance(hit, Square):
+                    self.view.marker_list.append(SquareMarker(self.view, hit.v, hit.v1))  # Note 2 coordinates here
+                elif isinstance(hit, Horizontal):
+                    print("Line Horizontal")
+                elif isinstance(hit, Vertical):
+                    print("Line Vertical")
+            if self.view.temp:  # if there is a graphics operation in progress
+                self.view.temp.mouse_move(v)  # tell the graphics operation about the mouse move
 
     def cmd_left_click(self, mx, my):
         """Called when user clicks left mouse button
         Note coordinates are windows relative, so top left corner of window is 0,0 wherever the window is on screen.
         """
         v = Vector2(mx, my)  # Convert windows space coordinates into model space vector
-        self.clicks.append(v)
-        hit = self.model.snap(self.clicks, v, 20)
-        if hit:
-            v = hit.v
-            self.clicks.pop()
+        if self.mode == "SELECT":
+            print(self.model.pick(v, 10))
+        else:
             self.clicks.append(v)
-        if len(self.clicks) == 1:  # First click
-            if self.mode == "LINE":
-                self.view.add_temp_line(v)
-            elif self.mode == "CIRCLE":
-                self.view.add_temp_circle(v)
-            elif self.mode == "RECTANGLE":
-                self.view.add_temp_rectangle(v)
-            elif self.mode == "PLINE":
-                self.view.add_temp_pline(v)
-        else:  # subsequent click
-            self.view.erase_markers()
-            if self.mode == "LINE":
-                self.view.temp.close(v)
-                self.view.temp = None
-                self.model.add_line(self.clicks)
-                self.clicks = []
-            elif self.mode == "CIRCLE":
-                self.view.temp.close(v)
-                self.view.temp = None
-                self.model.add_circle(self.clicks)
-                self.clicks = []
-            elif self.mode == "RECTANGLE":
-                self.view.temp.close(v)
-                self.view.temp = None
-                self.model.add_rectangle(self.clicks)
-                self.clicks = []
-            elif self.mode == "PLINE":
-                self.view.temp.add_node(v)
+            hit = self.model.snap(self.clicks, v, 20)
+            if hit:
+                v = hit.v
+                self.clicks.pop()
+                self.clicks.append(v)
+            if len(self.clicks) == 1:  # First click
+                if self.mode == "LINE":
+                    self.view.add_temp_line(v)
+                elif self.mode == "CIRCLE":
+                    self.view.add_temp_circle(v)
+                elif self.mode == "OVAL":
+                    self.view.add_temp_oval(v)
+                elif self.mode == "RECTANGLE":
+                    self.view.add_temp_rectangle(v)
+                elif self.mode == "PLINE":
+                    self.view.add_temp_pline(v)
+            else:  # subsequent click
+                self.view.erase_markers()
+                if self.mode == "LINE":
+                    self.view.temp.close(v)
+                    self.view.temp = None
+                    self.model.add_line(self.clicks)
+                    self.clicks = []
+                elif self.mode == "CIRCLE":
+                    self.view.temp.close(v)
+                    self.view.temp = None
+                    self.model.add_circle(self.clicks)
+                    self.clicks = []
+                elif self.mode == "OVAL":
+                    self.view.temp.close(v)
+                    self.view.temp = None
+                    self.model.add_oval(self.clicks)
+                    self.clicks = []
+                elif self.mode == "RECTANGLE":
+                    self.view.temp.close(v)
+                    self.view.temp = None
+                    self.model.add_rectangle(self.clicks)
+                    self.clicks = []
+                elif self.mode == "PLINE":
+                    self.view.temp.add_node(v)
 
     def cmd_right_click(self, x, y):
         """Show context menu. This depends on the mode we are in"""
@@ -188,17 +201,29 @@ class Controller:
             self.view.hide_toolbar()
 
     '''DRAWING COMMANDS'''
+    def cmd_select(self):
+        self.cmd_escape()
+        self.mode = "SELECT"
+
+
     def cmd_line(self):
+        self.cmd_escape()
         self.mode = "LINE"
 
     def cmd_circle(self):
-        """Sets us up to draw circles"""
+        self.cmd_escape()
         self.mode = "CIRCLE"
-        
+
+    def cmd_oval(self):
+        self.cmd_escape()
+        self.mode = "OVAL"
+
     def cmd_rectangle(self):
+        self.cmd_escape()
         self.mode = "RECTANGLE"
 
     def cmd_pline(self):
+        self.cmd_escape()
         self.mode = "PLINE"
 
     def cmd_pline_close(self):

@@ -17,10 +17,10 @@ class TextLine(Line):
         f.write("Line (%d, %d) - (%d, %d)\n" % (self.x0, self.y0, self.x1, self.y1))
 
 
-class TextCircle(Circle):
+class TextOval(Oval):
     def __init__(self,circle):
         self.circle=circle
-        super(TextCircle,self).__init__(circle.x,circle.y,circle.r)
+        super(TextOval,self).__init__(circle.x,circle.y,circle.r)
 
     def show(self,f):
         f.write("Circle (%d, %d) - %d\n" % (self.x, self.y, self.r))
@@ -56,8 +56,8 @@ class TextGroup(Group):
         for c in self.group.children:
             if isinstance(c,Line):
                 TextLine(c).show(self.f)
-            elif isinstance(c,Circle):
-                TextCircle(c).show(self.f)
+            elif isinstance(c,Oval):
+                TextOval(c).show(self.f)
             elif isinstance(c,Rectangle):
                 TextRectangle(c).show(self.f)
             elif isinstance(c,Text):

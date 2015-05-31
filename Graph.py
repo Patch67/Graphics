@@ -26,6 +26,21 @@ class Graph:
         """Search for coordinates within d - distance or v - Vector, i.e. Mouse click"""
         pass
 
+    def in_bounding_box(self, v):
+        """Returns true if v is inside the bounding box"""
+        lo = Vector2(min(self.v0.x, self.v1.x), min(self.v0.y, self.v1.y))
+        hi = Vector2(max(self.v0.y, self.v1.x), max(self.v0.x, self.v1.y))
+        return v.x >= lo.x and v.x <= hi.x and v.y >= lo.y and v.y <= hi.y
+
+    @abc.abstractmethod
+    def pick(self, v, d):
+        """Returns true if v is within d units of object"""
+        result = False
+        if self.in_bounding_box(v):
+            pass
+        return result
+
+
 class Line(Graph):
     """ Concrete class for graphics lines"""
 
@@ -85,13 +100,64 @@ class Line(Graph):
                 result = snaps[0]
         return result  # If there is one
 
+    def pick(self, v, d):
+        pass
 
-class Circle(Graph):
-    """ Concrete class for graphics circles"""
+
+class Circle:
+    """True circle, added in v0.2 to differentiate with oval"""
+
+    def __init__(self, centre, radius):
+        self.centre = centre
+        self.radius = radius
+
+    def snap(self, clicks, v, d):
+        result = None
+        '''Check for centre point'''
+        d2 = d * d
+        distance = self.centre.dist2(v)
+        if distance < d2:
+            result = Centre(self.centre, distance)
+        else:
+            '''Check for quadrants - N, E, S & W'''
+            N = Vector2(self.centre.x, self.centre.y + self.radius)
+            E = Vector2(self.centre.x + self.radius, self.centre.y)
+            S = Vector2(self.centre.x, self.centre.y - self.radius)
+            W = Vector2(self.centre.x - self.radius, self.centre.y)
+            distance = N.dist2(v)
+            if distance < d2:
+                result = MidPoint(N, distance)
+            else:
+                distance = E.dist2(v)
+                if distance < d2:
+                    result = MidPoint(E, distance)
+                else:
+                    distance = S.dist2(v)
+                    if distance < d2:
+                        result = MidPoint(S, distance)
+                    else:
+                        distance = W.dist2(v)
+                        if distance < d2:
+                            result = MidPoint(W, distance)
+        return result  # If there is one
+
+    def pick(self, v, d):
+        result = False
+        '''Look for circumference pick'''
+        centre = self.v0.mid(self.v1)
+        north = Vector2(centre.x, self.v0.y)
+        radius = centre.distance(north)
+        if abs(centre.distance(v) - radius) < d:
+            result = True
+        return result
+
+
+class Oval(Graph):
+    """ Concrete class for graphics ovals"""
 
     def __init__(self, v0, v1):
-        self.v0 = v0
-        self.v1 = v1
+        self.v0 = Vector2(min(v0.x, v1.x), min(v0.y, v1.y))  # Make v0 the smallest corner
+        self.v1 = Vector2(max(v0.x, v1.x), max(v0.y, v1.y))  # Make v1 the largest corner
 
     def snap(self, clicks, v, d):
         result = None
@@ -128,14 +194,28 @@ class Circle(Graph):
                             result = MidPoint(W, distance)
         return result  # If there is one
 
+    def in_bounding_box(self, v):
+        """Is v inside the bounding box"""
+        result = False
+        lo = self.v0
+        hi = self.v1
+        if v.x >= lo.x and v.x <= hi.x and v.y >= lo.y and v.y <= hi.y:
+            result = True
+        return result
 
+    def is_inside_box(self, lo, hi):
+        """Returns true if object is within the given box"""
+        result = False
+        if lo.x < self.v0.x and lo.y < self.v0.y and hi.x > self.v1.x and hi.y > self.v1.y:
+            result = True
+        return result
 
 class Rectangle(Graph):
     """ Concrete class for rectangles"""
 
     def __init__(self, v0, v1):
-        self.v0 = v0
-        self.v1 = v1
+        self.v0 = Vector2(min(v0.x, v1.x), min(v0.y, v1.y))  # Make v0 the smallest corner
+        self.v1 = Vector2(max(v0.x, v1.x), max(v0.y, v1.y))  # Make v1 the largest corner
 
     def snap(self, clicks, v, d):
         result = None
@@ -187,6 +267,18 @@ class Rectangle(Graph):
             result = snaps[0]
         return result # If there is one
 
+    def pick(self, v, d):
+        """This only works if rectangle is not rotated"""
+        result = False
+        if abs(self.v0.x - v.x) < d and v.y >= self.v0.y and v.y <= self.v1.y:  # Near left edge
+            result = True
+        elif abs(self.v1.x - v.x) < d and v.y >= self.v0.y and v.y <= self.v1.y:  # Near right edge
+            result = True
+        elif abs(self.v0.y - v.y) < d and v.x >= self.v0.x and v.x <= self.v1.x:  # Near top edge
+            result = True
+        elif abs(self.v1.y - v.y) < d and v.x >= self.v0.x and v.x <= self.v1.x:  # Near bottom edge
+            result = True
+        return result
 
 class Text(Graph):
     """ Concrete class for graphics text
@@ -258,3 +350,10 @@ class Group(Graph):
             snaps.sort(key=operator.attrgetter('distance'))
             result = snaps[0]
         return result
+
+    def pick(self, v, d):
+        pick_list = []
+        for child in self.children:
+            if child.pick(v, d):
+                pick_list.append(child)
+        return pick_list
