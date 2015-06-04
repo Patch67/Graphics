@@ -49,7 +49,7 @@ class TempLine(Temp):
         """Kill the temporary construction line and create the finished item"""
         self.canvas.delete(self.id)
         self.id = None
-        self.canvas.create_line(self.v0.x, self.v0.y, v.x, v.y)
+        #self.canvas.create_line(self.v0.x, self.v0.y, v.x, v.y)
 
 
 class TempRectangle(Temp):
@@ -67,7 +67,7 @@ class TempRectangle(Temp):
         self.v1 = v
         self.canvas.delete(self.id)
         self.id = None
-        self.canvas.create_rectangle(self.v0.x, self.v0.y, self.v1.x, self.v1.y)
+        #self.canvas.create_rectangle(self.v0.x, self.v0.y, self.v1.x, self.v1.y)
 
 
 class TempOval(Temp):
@@ -84,7 +84,7 @@ class TempOval(Temp):
     def close(self, v):
         self.canvas.delete(self.id)
         self.id = None
-        self.canvas.create_oval(self.v0.x, self.v0.y, v.x, v.y, fill="#476042")
+        #self.canvas.create_oval(self.v0.x, self.v0.y, v.x, v.y)
 
     def snap_more(self, v):
         """Overrides Temp.snap_more
@@ -129,7 +129,7 @@ class TempCircle(Temp):
         radius = self.v0.distance(v)
         lo = Vector2(self.v0.x - radius, self.v0.y - radius)
         hi = Vector2(self.v0.x + radius, self.v0.y + radius)
-        self.id = self.canvas.create_oval(lo.x, lo.y, hi.x, hi.y)  # Create new temp line
+        #self.id = self.canvas.create_oval(lo.x, lo.y, hi.x, hi.y)  # Create new temp line
 
 
 
@@ -158,8 +158,8 @@ class TempPline(Temp):
         Shouldn't I just recreate the last line?
         """
         #for i in range(len(self.nodes)-1):  # Exclude the last node
-        self.canvas.create_line(self.nodes[-2].x, self.nodes[-2].y, self.nodes[-1].x, self.nodes[-1].y)
+        '''self.canvas.create_line(self.nodes[-2].x, self.nodes[-2].y, self.nodes[-1].x, self.nodes[-1].y)
         if close:
             self.canvas.create_line(self.nodes[0].x, self.nodes[0].y, self.nodes[-1].x, self.nodes[-1].y)
-        self.nodes = []
+        self.nodes = []'''
 

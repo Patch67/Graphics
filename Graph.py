@@ -11,42 +11,67 @@ import abc
 from Vectors import Vector2
 from Snap import EndPoint, MidPoint, Centre, VerticalInline, HorizontalInline, Horizontal, Vertical, Square
 import operator
-#from math import sqrt # POSTPONED UNTIL VERSION 0.2
 
 class Graph:
-    """ Abstract base class from which all graphics object derive"""
-    __metaclass__ = abc.ABCMeta
+    """ Class from which all graphics object derive"""
+
+    def __init__(self):
+        self.selected = False
 
     @abc.abstractmethod
-    def __init__(self):
+    def snap(self, v, d):
         pass
+
+    def select_all(self):
+        self.selected = True
+
+    def deselect_all(self):
+        self.selected = False
+
+    @abc.abstractmethod
+    def pick(self, v, d):
+        pass
+
+    @abc.abstractmethod
+    def is_inside_box(self, lo, hi):
+        pass
+
+
+class Graph2(Graph):
+    """ Abstract base class from which all graphics object derive"""
+
+    def __init__(self, v0, v1):
+        '''Ensure v0 is lowest corner and v1 is highest'''
+        super(Graph2, self).__init__()
+        # The following two lines were added to automatically make a bounding box but they broke line
+        #self.v0 = Vector2(min(v0.x, v1.x), min(v0.y, v1.y))  # Make v0 the smallest corner
+        #self.v1 = Vector2(max(v0.x, v1.x), max(v0.y, v1.y))  # Make v1 the largest corner
+        self.v0 = v0
+        self.v1 = v1
 
     @abc.abstractmethod
     def snap(self, v, d):
         """Search for coordinates within d - distance or v - Vector, i.e. Mouse click"""
         pass
 
-    def in_bounding_box(self, v):
-        """Returns true if v is inside the bounding box"""
-        lo = Vector2(min(self.v0.x, self.v1.x), min(self.v0.y, self.v1.y))
-        hi = Vector2(max(self.v0.y, self.v1.x), max(self.v0.x, self.v1.y))
-        return v.x >= lo.x and v.x <= hi.x and v.y >= lo.y and v.y <= hi.y
-
     @abc.abstractmethod
     def pick(self, v, d):
         """Returns true if v is within d units of object"""
+        pass
+
+    def is_inside_box(self, lo, hi):
+        """Returns true if object is within the given box"""
         result = False
-        if self.in_bounding_box(v):
-            pass
+        if lo.x < self.v0.x and lo.y < self.v0.y and hi.x > self.v1.x and hi.y > self.v1.y:
+            result = True
         return result
 
 
-class Line(Graph):
+class Line(Graph2):
     """ Concrete class for graphics lines"""
 
     def __init__(self, v0, v1):
-        self.v0 = v0
-        self.v1 = v1
+        super(Line, self).__init__(v0, v1)
 
     def snap(self, clicks, v, d):
         """If start point, end point or mid point is within d units return
@@ -100,14 +125,12 @@ class Line(Graph):
                 result = snaps[0]
         return result  # If there is one
 
-    def pick(self, v, d):
-        pass
 
-
-class Circle:
+class Circle(Graph):
     """True circle, added in v0.2 to differentiate with oval"""
 
     def __init__(self, centre, radius):
+        super(Circle, self).__init__()
         self.centre = centre
         self.radius = radius
 
@@ -142,22 +165,27 @@ class Circle:
         return result  # If there is one
 
     def pick(self, v, d):
-        result = False
-        '''Look for circumference pick'''
-        centre = self.v0.mid(self.v1)
-        north = Vector2(centre.x, self.v0.y)
-        radius = centre.distance(north)
-        if abs(centre.distance(v) - radius) < d:
+        """Pick if near circumference"""
+        if abs(self.centre.distance(v) - self.radius) < d:
             result = True
+        else:
+            result = False
+        return result
+
+    def is_inside_box(self, lo, hi):
+        """Returns true if object is within the given box"""
+        if lo.x < self.centre.x and lo.y < self.centre.y and hi.x > self.centre.x and hi.y > self.centre.y:
+            result = True
+        else:
+            result = False
         return result
 
 
-class Oval(Graph):
+class Oval(Graph2):
     """ Concrete class for graphics ovals"""
 
     def __init__(self, v0, v1):
-        self.v0 = Vector2(min(v0.x, v1.x), min(v0.y, v1.y))  # Make v0 the smallest corner
-        self.v1 = Vector2(max(v0.x, v1.x), max(v0.y, v1.y))  # Make v1 the largest corner
+        super(Oval, self).__init__(v0, v1)
 
     def snap(self, clicks, v, d):
         result = None
@@ -194,28 +222,12 @@ class Oval(Graph):
                             result = MidPoint(W, distance)
         return result  # If there is one
 
-    def in_bounding_box(self, v):
-        """Is v inside the bounding box"""
-        result = False
-        lo = self.v0
-        hi = self.v1
-        if v.x >= lo.x and v.x <= hi.x and v.y >= lo.y and v.y <= hi.y:
-            result = True
-        return result
 
-    def is_inside_box(self, lo, hi):
-        """Returns true if object is within the given box"""
-        result = False
-        if lo.x < self.v0.x and lo.y < self.v0.y and hi.x > self.v1.x and hi.y > self.v1.y:
-            result = True
-        return result
-
-class Rectangle(Graph):
+class Rectangle(Graph2):
     """ Concrete class for rectangles"""
 
     def __init__(self, v0, v1):
-        self.v0 = Vector2(min(v0.x, v1.x), min(v0.y, v1.y))  # Make v0 the smallest corner
-        self.v1 = Vector2(max(v0.x, v1.x), max(v0.y, v1.y))  # Make v1 the largest corner
+        super(Rectangle, self).__init__(v0, v1)
 
     def snap(self, clicks, v, d):
         result = None
@@ -280,18 +292,21 @@ class Rectangle(Graph):
             result = True
         return result
 
+
 class Text(Graph):
     """ Concrete class for graphics text
     Based on the MVC architectural pattern so only for data handling, not actually drawing
     """
 
     def __init__(self, v0, text):
+        super(Text, self).__init__()
         self.v0 = v0
         self.text = text
 
 
 class Pline(Graph):
     def __init__(self, nodes, close):
+        super(Pline, self).__init__()
         self.nodes = nodes
         self.close = close
 
@@ -320,6 +335,7 @@ class Pline(Graph):
             result = snaps[0]
         return result # If there is one
 
+
 class Group(Graph):
     """ Concrete class for graphics group
     Implements the composite pattern
@@ -327,6 +343,7 @@ class Group(Graph):
     """
 
     def __init__(self, name):
+        super(Group, self).__init__()
         self.name = name
         self.children = []
 
@@ -351,9 +368,21 @@ class Group(Graph):
             result = snaps[0]
         return result
 
+    def select_all(self):
+        for child in self.children:
+            child.select_all()
+
+    def deselect_all(self):
+        for child in self.children:
+            child.deselect_all()
+
     def pick(self, v, d):
         pick_list = []
         for child in self.children:
             if child.pick(v, d):
                 pick_list.append(child)
         return pick_list
+
+    def is_inside_box(self, lo, hi):
+        # TODO: Put something better in here. This is a fudge
+        return True

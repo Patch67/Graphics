@@ -73,12 +73,14 @@ class View:
         edit_menu.add_separator()
         edit_menu.add_command(label="Delete", command = self.control.cmd_null)
         edit_menu.add_separator()
-        edit_menu.add_command(label="Select all", command = self.control.cmd_null)
+        edit_menu.add_command(label="Select all", command = self.control.cmd_select_all)
+        edit_menu.add_command(label="Redraw", command = self.control.cmd_redraw)
         menu_bar.add_cascade(label="Edit", menu=edit_menu)
 
         # drawing menus
         drawing_menu = Menu(menu_bar, tearoff=0)
         drawing_menu.add_command(label="Select", command=self.control.cmd_select)
+        drawing_menu.add_command(label="Box", command=self.control.cmd_selection_box)
         drawing_menu.add_command(label="Line", command=self.control.cmd_line)
         drawing_menu.add_command(label="Rectangle", command=self.control.cmd_rectangle)
         drawing_menu.add_command(label="Oval", command=self.control.cmd_oval)
@@ -131,12 +133,15 @@ class View:
         """Binds keyboard events to handlers"""
         self.canvas.bind("<Control-o>", self.key_open)
         self.canvas.bind("<Control-s>", self.key_save)
+        self.canvas.bind("<Control-a>", self.key_select_all)
         self.canvas.bind("<Button-1>", self.left_click)
         self.canvas.bind("<Button-3>", self.right_click)
         self.canvas.bind("<Configure>", self.on_resize)
         self.canvas.bind("<Motion>", self.on_move)
         self.canvas.bind("<Escape>", self.key_escape)
         self.canvas.bind("<Key>", self.on_key)
+        self.canvas.bind('<B1-Motion>', self.on_left_drag)
+        self.canvas.bind("<ButtonRelease-1>", self.on_left_release)
         self.master.protocol('WM_DELETE_WINDOW', self.control.cmd_exit) # Window closing event
 
     """
@@ -159,6 +164,12 @@ class View:
         elif e.char == "p":
             self.control.cmd_pline()
 
+    def on_left_drag(self, e):
+        self.control.cmd_left_drag(e.x, e.y)
+
+    def on_left_release(self, e):
+        self.control.cmd_left_release(e.x, e.y)
+
     def on_resize(self, e):
         """Called when window changes size"""
         pass
@@ -168,6 +179,9 @@ class View:
 
     def key_save(self, e):
         self.control.cmd_open()
+
+    def key_select_all(self, e):
+        self.control.cmd_select_all()
 
     def left_click(self, e):
         self.control.cmd_left_click(e.x, e.y)  # e.x & e.y are canvas relative
@@ -224,27 +238,27 @@ class View:
     """
     View methods to draw Graph objects
     """
-    def redraw(self, graph):
-        """In tkinter redraw is not needed because canvas graphics are permanent
-        In an application with transient graphics we would need to redraw all the objects
-        but tkinter canvas does this for us
-        """
-        self.temp = None
-        pass  # Do nothing
-
     def erase_markers(self):
         for marker_id in self.marker_list:
             self.canvas.delete(marker_id)
 
     def draw_line(self, line):
         """Add a new, permanent, line to canvas"""
-        self.canvas.create_line(line.v0.x, line.v0.y, line.v1.x, line.v1.y)
+        if line.selected:
+            colour = "blue"
+        else:
+            colour = "black"
+        self.canvas.create_line(line.v0.x, line.v0.y, line.v1.x, line.v1.y, fill=colour)
         self.temp = None  # Clear the temp object.
 
     def draw_oval(self, oval):
         """Add a new, permanent, oval to canvas"""
+        if oval.selected:
+            colour = "blue"
+        else:
+            colour = "black"
 
-        self.canvas.create_oval(oval.v0.x, oval.v0.y, oval.v1.x, oval.v1.y)
+        self.canvas.create_oval(oval.v0.x, oval.v0.y, oval.v1.x, oval.v1.y, outline=colour)
         self.temp = None  # Clear the temp object.
 
     def draw_circle(self, circle):
@@ -252,23 +266,39 @@ class View:
 
         lo = Vector2(circle.centre.x - circle.radius, circle.centre.y - circle.radius)
         hi = Vector2(circle.centre.x + circle.radius, circle.centre.y + circle.radius)
-        self.canvas.create_oval(lo.x, lo.y, hi.x, hi.y)  # Create new temp line
+        if circle.selected:
+            colour = "blue"
+        else:
+            colour = "black"
+
+        self.canvas.create_oval(lo.x, lo.y, hi.x, hi.y, outline=colour)  # Create new temp line
         self.temp = None  # Clear the temp object.
 
     def draw_rectangle(self, rectangle):
         """Add a new, permanent, rectangle to canvas"""
-        self.canvas.create_rectangle(rectangle.v0.x, rectangle.v0.y, rectangle.v1.x, rectangle.v1.y)
+        if rectangle.selected:
+            colour = "blue"
+        else:
+            colour = "black"
+
+        self.canvas.create_rectangle(rectangle.v0.x, rectangle.v0.y, rectangle.v1.x, rectangle.v1.y, outline=colour)
         self.temp = None  # Clear the temp object.
 
     def draw_pline(self, pline):
         """Add a new, permanent, pline to canvas"""
-        start = pline.nodes.pop(0)
+        start = pline.nodes[0]
         temp = start
-        for node in pline.nodes:
-            self.canvas.create_line(temp.x, temp.y, node.x, node.y)
+        if pline.selected:
+            colour = "blue"
+        else:
+            colour = "black"
+
+        for i in range(1, len(pline.nodes)):
+            node = pline.nodes[i]
+            self.canvas.create_line(temp.x, temp.y, node.x, node.y, fill=colour)
             temp = node
         if pline.close:
-            self.canvas.create_line(node.x, node.y, start.x, start.y)
+            self.canvas.create_line(node.x, node.y, start.x, start.y, fill=colour)
         self.temp = None  # Clear the temp object.
 
     def draw_group(self, group):

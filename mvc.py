@@ -19,6 +19,7 @@ class Controller:
         self.stateTools = True
         self.mode = "SELECT"
         self.clicks = []  # A list of clicks, not just one.
+        self.selection_list = []
         self.view.run()  # Start the GUI
 
     @property
@@ -43,7 +44,7 @@ class Controller:
     def dirty_changed(self):
         """Called by Model whenever dirty changes"""
         self.set_title()
-        self.view.redraw(self.model.graph)  # In tkinter graphics objects are permanent so no need to redraw
+        self.view.draw_group(self.model.graph)  # Force redraw
 
     '''COMMANDS - Responses to GUI events'''
 
@@ -99,6 +100,13 @@ class Controller:
                 self.cmd_save()
         self.view.exit()  # Exit the application
 
+    def cmd_select_all(self):
+        self.model.select_all()
+
+    def cmd_redraw(self):
+        self.view.clear()
+        self.view.draw_group(self.model.graph)
+
     def cmd_escape(self):
         self.clicks = []
         if self.view.temp:  # if we are in the process of creating an object
@@ -136,9 +144,13 @@ class Controller:
         """Called when user clicks left mouse button
         Note coordinates are windows relative, so top left corner of window is 0,0 wherever the window is on screen.
         """
+        print("Left click %d, %d" % (mx, my))
+
         v = Vector2(mx, my)  # Convert windows space coordinates into model space vector
         if self.mode == "SELECT":
-            print(self.model.pick(v, 10))
+            self.selection_list = [self.model.pick(v, 10)]
+        elif self.mode == "BOX":
+            pass
         else:
             self.clicks.append(v)
             hit = self.model.snap(self.clicks, v, 20)
@@ -189,6 +201,14 @@ class Controller:
         else:
             self.view.show_context_menu(x, y)  # Show generic context menu
 
+    def cmd_left_drag(self, x, y):
+        v = Vector2(x,y)
+        if self.mode == "SELECT":
+            print("Dragging %d, %d" % (v.x, v.y))
+
+    def cmd_left_release(self, x, y):
+        print("End Drag at %d, %d" % (x, y))
+
     def cmd_null(self):
         self.view.info_box(self.name, "Not yet implemented")
 
@@ -205,6 +225,9 @@ class Controller:
         self.cmd_escape()
         self.mode = "SELECT"
 
+    def cmd_selection_box(self):
+        self.cmd_escape()
+        self.mode = "BOX"
 
     def cmd_line(self):
         self.cmd_escape()

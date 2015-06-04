@@ -41,6 +41,7 @@ class Model():
 
     def add_circle(self, nodes):
         self.graph.add(Circle(nodes[0], nodes[0].distance(nodes[1])))
+        self.dirty = True
 
     def add_oval(self, nodes):
         self.graph.add(Oval(nodes[0], nodes[1]))
@@ -82,6 +83,10 @@ class Model():
             self.dirty = False
         except IOError:
             print("Error could not save %s" % file.name)
+
+    def select_all(self):
+        self.graph.select_all()
+        self.dirty = True
 
     def snap(self, clicks, v, d):
         """A pass through method to avoid Controller calling graph.snap directly.
