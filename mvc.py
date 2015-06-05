@@ -19,7 +19,7 @@ class Controller:
         self.stateTools = True
         self.mode = "SELECT"
         self.clicks = []  # A list of clicks, not just one.
-        self.selection_list = []
+        self.paste_buffer = None
         self.view.run()  # Start the GUI
 
     @property
@@ -54,7 +54,7 @@ class Controller:
         self.model = Model(self)
         self.filename = ""
         self.clicks = []
-        self.view.clear()
+        self.view.clear_screen()
 
     def cmd_open(self):
         """Controls the process of opening a file
@@ -104,13 +104,13 @@ class Controller:
         self.model.select_all()
 
     def cmd_redraw(self):
-        self.view.clear()
+        self.view.clear_screen()
         self.view.draw_group(self.model.graph)
 
     def cmd_escape(self):
         self.clicks = []
         if self.view.temp:  # if we are in the process of creating an object
-            self.view.temp.escape()  # remove any creation artefacts
+            self.view.temp.erase_construction_graphics()  # remove any creation artefacts
             self.view.temp = None  # reset creation object
 
     def mouse_move(self, x, y):
@@ -137,6 +137,10 @@ class Controller:
                     print("Line Horizontal")
                 elif isinstance(hit, Vertical):
                     print("Line Vertical")
+                if self.mode == "PASTE":
+                    print("PASTE")
+                    print(self.view.temp)
+
             if self.view.temp:  # if there is a graphics operation in progress
                 self.view.temp.mouse_move(v)  # tell the graphics operation about the mouse move
 
@@ -144,7 +148,7 @@ class Controller:
         """Called when user clicks left mouse button
         Note coordinates are windows relative, so top left corner of window is 0,0 wherever the window is on screen.
         """
-        print("Left click %d, %d" % (mx, my))
+        #print("Left click %d, %d" % (mx, my))
 
         v = Vector2(mx, my)  # Convert windows space coordinates into model space vector
         if self.mode == "SELECT":
@@ -169,30 +173,40 @@ class Controller:
                     self.view.add_temp_rectangle(v)
                 elif self.mode == "PLINE":
                     self.view.add_temp_pline(v)
+                elif self.mode == "PASTE":
+                    print("Paste 1st click")
+                    self.view.add_temp_paste(v, self.paste_buffer)
             else:  # subsequent click
                 self.view.erase_markers()
                 if self.mode == "LINE":
-                    self.view.temp.close(v)
+                    self.view.temp.close()
                     self.view.temp = None
                     self.model.add_line(self.clicks)
                     self.clicks = []
                 elif self.mode == "CIRCLE":
-                    self.view.temp.close(v)
+                    self.view.temp.close()
                     self.view.temp = None
                     self.model.add_circle(self.clicks)
                     self.clicks = []
                 elif self.mode == "OVAL":
-                    self.view.temp.close(v)
+                    self.view.temp.close()
                     self.view.temp = None
                     self.model.add_oval(self.clicks)
                     self.clicks = []
                 elif self.mode == "RECTANGLE":
-                    self.view.temp.close(v)
+                    self.view.temp.close()
                     self.view.temp = None
                     self.model.add_rectangle(self.clicks)
                     self.clicks = []
                 elif self.mode == "PLINE":
                     self.view.temp.add_node(v)
+                elif self.mode == "PASTE":
+                    print("Paste subsequent click")
+                    print(self.paste_buffer)
+                    self.view.temp.close()
+                    self.view.temp = None
+                    self.model.paste(self.paste_buffer)
+                    self.clicks = []
 
     def cmd_right_click(self, x, y):
         """Show context menu. This depends on the mode we are in"""
@@ -207,7 +221,8 @@ class Controller:
             print("Dragging %d, %d" % (v.x, v.y))
 
     def cmd_left_release(self, x, y):
-        print("End Drag at %d, %d" % (x, y))
+        #print("End Drag at %d, %d" % (x, y))
+        pass
 
     def cmd_null(self):
         self.view.info_box(self.name, "Not yet implemented")
@@ -219,6 +234,20 @@ class Controller:
             self.view.show_toolbar()
         else:
             self.view.hide_toolbar()
+
+    '''EDITING COMMANDS'''
+    def cmd_cut(self):
+        pass
+
+    def cmd_copy(self):
+        self.paste_buffer = self.model.get_selected()
+        for element in self.paste_buffer.children:
+            print(element)
+
+    def cmd_paste(self):
+        self.cmd_escape()
+        if self.paste_buffer:
+            self.mode = "PASTE"
 
     '''DRAWING COMMANDS'''
     def cmd_select(self):
@@ -250,13 +279,13 @@ class Controller:
         self.mode = "PLINE"
 
     def cmd_pline_close(self):
-        self.view.temp.close(True)  # Close pline with the last right click
+        self.view.temp.close()  # Close pline with the last right click
         self.view.temp = None  # Kill the temp object
         self.model.add_poly_line(self.clicks, True)  # Add pline
         self.clicks = []
 
     def cmd_pline_end(self):
-        self.view.temp.close(False)  # Close pline with the last right click
+        self.view.temp.close()  # Close pline with the last right click
         self.view.temp = None  # Kill the temp object
         self.model.add_poly_line(self.clicks, False)  # Add pline
         self.clicks = []

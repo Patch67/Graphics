@@ -88,6 +88,13 @@ class Model():
         self.graph.select_all()
         self.dirty = True
 
+    def paste(self, buffer):
+        self.graph.add(buffer)
+        self.dirty = True
+
+    def get_selected(self):
+        return self.graph.get_selected()
+
     def snap(self, clicks, v, d):
         """A pass through method to avoid Controller calling graph.snap directly.
         :param v: Vector2

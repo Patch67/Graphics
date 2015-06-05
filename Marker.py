@@ -14,7 +14,7 @@ class Marker:
         self.colour = "#ff0000"
 
     def erase(self):
-        self.view.canvas.delete(self.id_list)
+        self.view.canvas.erase_construction_graphics(self.id_list)
 
 
 class EndPointMarker(Marker):

@@ -1,7 +1,7 @@
 from tkinter import Tk, filedialog, Canvas, Menu, Frame, BOTH, YES, RAISED, Button, TOP, LEFT, Y, messagebox,\
     IntVar, Checkbutton
 #from PIL import Image, ImageTk
-from Temp import TempLine, TempOval, TempRectangle, TempPline, TempCircle
+from Temp import TempLine, TempOval, TempRectangle, TempPline, TempCircle, TempPaste
 from Vectors import Vector2
 
 class View:
@@ -65,15 +65,15 @@ class View:
         # edit menus
         edit_menu = Menu(menu_bar, tearoff=0)
         edit_menu.add_command(label="Undo", accelerator="^Z", command=self.control.cmd_null)
-        edit_menu.add_command(label="Redo", accelerator="^C", command=self.control.cmd_null)
+        edit_menu.add_command(label="Redo", command=self.control.cmd_null)
         edit_menu.add_separator()
-        edit_menu.add_command(label="Cut", accelerator="^X", command=self.control.cmd_null)
-        edit_menu.add_command(label="Copy", accelerator="^C", command=self.control.cmd_null)
-        edit_menu.add_command(label="Paste", accelerator="^V", command=self.control.cmd_null)
+        edit_menu.add_command(label="Cut", accelerator="^X", command=self.control.cmd_cut)
+        edit_menu.add_command(label="Copy", accelerator="^C", command=self.control.cmd_copy)
+        edit_menu.add_command(label="Paste", accelerator="^V", command=self.control.cmd_paste)
         edit_menu.add_separator()
         edit_menu.add_command(label="Delete", command = self.control.cmd_null)
         edit_menu.add_separator()
-        edit_menu.add_command(label="Select all", command = self.control.cmd_select_all)
+        edit_menu.add_command(label="Select all", accelerator="^A", command = self.control.cmd_select_all)
         edit_menu.add_command(label="Redraw", command = self.control.cmd_redraw)
         menu_bar.add_cascade(label="Edit", menu=edit_menu)
 
@@ -134,6 +134,9 @@ class View:
         self.canvas.bind("<Control-o>", self.key_open)
         self.canvas.bind("<Control-s>", self.key_save)
         self.canvas.bind("<Control-a>", self.key_select_all)
+        self.canvas.bind("<Control-x>", self.key_cut)
+        self.canvas.bind("<Control-c>", self.key_copy)
+        self.canvas.bind("<Control-v>", self.key_paste)
         self.canvas.bind("<Button-1>", self.left_click)
         self.canvas.bind("<Button-3>", self.right_click)
         self.canvas.bind("<Configure>", self.on_resize)
@@ -182,6 +185,15 @@ class View:
 
     def key_select_all(self, e):
         self.control.cmd_select_all()
+
+    def key_cut(self, e):
+        self.control.cmd_cut()
+
+    def key_copy(self, e):
+        self.control.cmd_copy()
+
+    def key_paste(self, e):
+        self.control.cmd_paste()
 
     def left_click(self, e):
         self.control.cmd_left_click(e.x, e.y)  # e.x & e.y are canvas relative
@@ -248,8 +260,7 @@ class View:
             colour = "blue"
         else:
             colour = "black"
-        self.canvas.create_line(line.v0.x, line.v0.y, line.v1.x, line.v1.y, fill=colour)
-        self.temp = None  # Clear the temp object.
+        return self.canvas.create_line(line.v0.x, line.v0.y, line.v1.x, line.v1.y, fill=colour)
 
     def draw_oval(self, oval):
         """Add a new, permanent, oval to canvas"""
@@ -257,22 +268,17 @@ class View:
             colour = "blue"
         else:
             colour = "black"
-
-        self.canvas.create_oval(oval.v0.x, oval.v0.y, oval.v1.x, oval.v1.y, outline=colour)
-        self.temp = None  # Clear the temp object.
+        return self.canvas.create_oval(oval.v0.x, oval.v0.y, oval.v1.x, oval.v1.y, outline=colour)
 
     def draw_circle(self, circle):
         """Add a new, permanent, circle to canvas"""
-
         lo = Vector2(circle.centre.x - circle.radius, circle.centre.y - circle.radius)
         hi = Vector2(circle.centre.x + circle.radius, circle.centre.y + circle.radius)
         if circle.selected:
             colour = "blue"
         else:
             colour = "black"
-
-        self.canvas.create_oval(lo.x, lo.y, hi.x, hi.y, outline=colour)  # Create new temp line
-        self.temp = None  # Clear the temp object.
+        return self.canvas.create_oval(lo.x, lo.y, hi.x, hi.y, outline=colour)  # Create new temp line
 
     def draw_rectangle(self, rectangle):
         """Add a new, permanent, rectangle to canvas"""
@@ -280,12 +286,12 @@ class View:
             colour = "blue"
         else:
             colour = "black"
-
-        self.canvas.create_rectangle(rectangle.v0.x, rectangle.v0.y, rectangle.v1.x, rectangle.v1.y, outline=colour)
-        self.temp = None  # Clear the temp object.
+        return self.canvas.create_rectangle(rectangle.v0.x, rectangle.v0.y, rectangle.v1.x, rectangle.v1.y, outline=colour)
 
     def draw_pline(self, pline):
         """Add a new, permanent, pline to canvas"""
+        self.temp = None  # Clear the temp object.
+        id_list = []  # Use to store multiple canvas ids
         start = pline.nodes[0]
         temp = start
         if pline.selected:
@@ -295,31 +301,34 @@ class View:
 
         for i in range(1, len(pline.nodes)):
             node = pline.nodes[i]
-            self.canvas.create_line(temp.x, temp.y, node.x, node.y, fill=colour)
+            id_list.append(self.canvas.create_line(temp.x, temp.y, node.x, node.y, fill=colour))
             temp = node
         if pline.close:
-            self.canvas.create_line(node.x, node.y, start.x, start.y, fill=colour)
-        self.temp = None  # Clear the temp object.
+            id_list.append(self.canvas.create_line(node.x, node.y, start.x, start.y, fill=colour))
+        return id_list  # return list if ids
 
     def draw_group(self, group):
-        self.clear()
+        id_list = []
+        self.clear_screen()
         for child in group.children:
             t = type(child).__name__
             if t == "Line":
-                self.draw_line(child)
+                id_list += [self.draw_line(child)]
             elif t == "Oval":
-                self.draw_oval(child)
+                id_list += [self.draw_oval(child)]
             elif t == "Circle":
-                self.draw_circle(child)
+                id_list += [self.draw_circle(child)]
             elif t == "Rectangle":
-                self.draw_rectangle(child)
+                id_list += [self.draw_rectangle(child)]
             elif t == "Pline":
-                self.draw_pline(child)
-        self.temp = None  # Clear the temp object.
+                id_list += [self.draw_pline(child)]
+            elif t == "Group":
+                id_list += [self.draw_group(child)]
+        return id_list
 
-    def clear(self):
+    def clear_screen(self):
         self.canvas.delete("all")
-        self.temp = None
+        #self.temp = None
 
     """
     Set up temporary construction objects
@@ -341,3 +350,6 @@ class View:
 
     def add_temp_pline(self, v):
         self.temp = TempPline(self, v)
+
+    def add_temp_paste(self, v, paste_buffer):
+        self.temp = TempPaste(self, v, paste_buffer)

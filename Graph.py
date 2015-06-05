@@ -36,9 +36,12 @@ class Graph:
     def is_inside_box(self, lo, hi):
         pass
 
+    @abc.abstractmethod
+    def move(self, v):
+        pass
 
 class Graph2(Graph):
-    """ Abstract base class from which all graphics object derive"""
+    """ Class from which all graphics 2 point graphics objects derive"""
 
     def __init__(self, v0, v1):
         '''Ensure v0 is lowest corner and v1 is highest'''
@@ -65,6 +68,12 @@ class Graph2(Graph):
         if lo.x < self.v0.x and lo.y < self.v0.y and hi.x > self.v1.x and hi.y > self.v1.y:
             result = True
         return result
+
+    def move(self, v):
+        self.v0.x += v.x
+        self.v0.y += v.y
+        self.v1.x += v.x
+        self.v1.y += v.y
 
 
 class Line(Graph2):
@@ -167,10 +176,7 @@ class Circle(Graph):
     def pick(self, v, d):
         """Pick if near circumference"""
         if abs(self.centre.distance(v) - self.radius) < d:
-            result = True
-        else:
-            result = False
-        return result
+            self.selected = True
 
     def is_inside_box(self, lo, hi):
         """Returns true if object is within the given box"""
@@ -290,7 +296,8 @@ class Rectangle(Graph2):
             result = True
         elif abs(self.v1.y - v.y) < d and v.x >= self.v0.x and v.x <= self.v1.x:  # Near bottom edge
             result = True
-        return result
+        if result:
+            self.selected = True
 
 
 class Text(Graph):
@@ -386,3 +393,14 @@ class Group(Graph):
     def is_inside_box(self, lo, hi):
         # TODO: Put something better in here. This is a fudge
         return True
+
+    def get_selected(self):
+        selection_buffer = Group("Paste_buffer")
+        for child in self.children:
+            if child.selected:
+                selection_buffer.add(child)
+        return selection_buffer
+
+    def move(self, v):
+        for child in self.children:
+            child.move(v)
